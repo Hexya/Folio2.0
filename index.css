@@ -1,0 +1,624 @@
+@font-face {
+    font-family: 'Avenir';
+    src: url('./assets/fonts/SourceSansPro/SourceSansPro-Regular.ttf');
+}
+@font-face {
+    font-family: 'Avenir-Light';
+    src: url('./assets/fonts/SourceSansPro/SourceSansPro-ExtraLight.ttf');
+}
+/*** ELEMENT THREE ***/
+.dg,
+.ac {
+    z-index: 999 !important;
+}
+#stats {
+    position: fixed;
+    z-index: 999;
+}
+/*** DEFAULT ***/
+body {
+    overflow-x: hidden;
+    overflow-y: hidden;
+    font-family: Avenir;
+}
+* {
+    margin: 0;
+    padding: 0;
+}
+*::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+    opacity: 0;
+    visibility: hidden;
+}
+
+audio {
+    position: absolute;
+    z-index: -1;
+}
+/*** LOADER ***/
+.loader {
+    position: absolute;
+    height: 100vh;
+    width: 100%;
+    background: #000;
+    z-index: 999;
+}
+.loader .load-progress {
+    position: absolute;
+    top: calc(45% + 90px);
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #d0c9bf;
+    font-size: 1rem;
+}
+.loader .intro-txt {
+    position: absolute;
+    display: none;
+    font-family: Avenir-Light;
+    top: calc(45% + 90px);
+    width: 290px;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #d0c9bf;
+    text-align: center;
+    font-size: 1rem;
+}
+#main {
+    position: absolute;
+    top: 0;
+}
+#main .txt-container {
+    color: #FFF;
+    position: absolute;
+    left: 10%;
+    bottom: 10%;
+    display: flex;
+    font-size: 14px;
+    letter-spacing: 4px;
+}
+#main .txt-container .hidari {
+    text-align: right;
+}
+#main .txt-container .hidari .txt-s {
+    margin-top: 5px;
+    margin-right: 15px;
+}
+#main .txt-container .migi {
+    text-align: right;
+    margin-top: 20px;
+    margin-left: 20px;
+}
+#main .txt-container .migi .txt-s {
+    margin-top: 5px;
+    margin-right: 30px;
+}
+#main .txt-container.project-container-hidari,
+#main .txt-container.project-container-migi {
+    bottom: 52vh;
+    font-family: Avenir-Light;
+}
+#main .txt-container.project-container-hidari .title,
+#main .txt-container.project-container-migi .title {
+    color: #FFB73A;
+    font-size: 2.3rem;
+}
+#main .txt-container.project-container-hidari .desc,
+#main .txt-container.project-container-migi .desc {
+    font-size: 1em;
+}
+#main .txt-container.project-container-hidari .date,
+#main .txt-container.project-container-migi .date {
+    margin-top: 30px;
+    font-size: 1.1em;
+    color: #FFB73A;
+}
+#main .txt-container.project-container-hidari {
+    left: 10%;
+}
+#main .txt-container.project-container-migi {
+    left: 58%;
+}
+#main .contact {
+    height: 130px;
+    width: 200px;
+    position: absolute;
+    right: 30px;
+    bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    opacity: .7;
+}
+#main .contact .git-icon {
+    height: 15px;
+    width: 15px;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+#main .contact .git-icon .st0 {
+    fill: #FFF;
+    transition: all .3s;
+}
+#main .contact .git-icon:hover .st0 {
+    transition: all .3s;
+    fill: #FFB73A;
+}
+#main .contact p {
+    color: #FFF;
+    font-family: Avenir-Light;
+    cursor: pointer;
+    transition: all .05s;
+}
+#main .contact p:hover {
+    color: #FFB73A;
+    transition: all .05s;
+}
+#main .contact p:hover .hidari {
+    margin-right: 7px;
+    transition: all .05s;
+}
+#main .contact p:hover .migi {
+    margin-right: 2px;
+    transition: all .05s;
+}
+.remove-scene {
+    animation: removeOpacity 0.5s ease-out forwards;
+}
+@keyframes removeOpacity {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+.about-container {
+    position: absolute;
+    height: 100vh;
+    width: 100%;
+    background: #000;
+    z-index: 90;
+    opacity: 0;
+    visibility: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+.about-container .name {
+    padding-top: 17vh;
+    height: 18vh;
+}
+.about-container .name p {
+    font-size: 4rem;
+    color: #FFB73A;
+    letter-spacing: 2.5rem;
+    font-family: Avenir-Light;
+}
+.about-container .formation {
+    margin-top: 30px;
+    color: #fff;
+    font-size: 14px;
+    letter-spacing: 4px;
+}
+.about-container .desc {
+    margin-top: 15vh;
+    color: #d0c9bf;
+    width: 470px;
+}
+.about-container .contact {
+    padding-top: 10vh;
+    height: 4vh;
+    width: 200px;
+    display: flex;
+    justify-content: space-around;
+    opacity: .7;
+}
+.about-container .contact .git-icon {
+    height: 23px;
+    width: 23px;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+.about-container .contact .git-icon .st0 {
+    fill: #d0c9bf;
+    transition: all .3s;
+}
+.about-container .contact .git-icon:hover .st0 {
+    transition: all .3s;
+    fill: #FFB73A;
+}
+.about-container .contact p {
+    color: #FFF;
+    font-family: Avenir-Light;
+    cursor: pointer;
+    transition: all .05s;
+}
+.about-container .contact p:hover {
+    color: #FFB73A;
+    transition: all .05s;
+}
+.about-container .contact p:hover .hidari {
+    margin-right: 7px;
+    transition: all .05s;
+}
+.about-container .contact p:hover .migi {
+    margin-right: 2px;
+    transition: all .05s;
+}
+.about-container .designer {
+    margin-top: 10vh;
+    color: rgba(208, 201, 191, 0.5);
+    font-size: 10px;
+    letter-spacing: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all .3s;
+}
+.about-container .designer:hover {
+    color: rgba(208, 201, 191, 0.8);
+    transition: all .3s;
+}
+
+/* CSS update */
+.back-arrow, .project-arrow {
+    width: 30px;
+    height: auto;
+    cursor: pointer;
+    position: absolute;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 99;
+}
+
+.back-arrow svg, .project-arrow svg {
+    transform: rotate(90deg) ;
+}
+.back-arrow .return, .project-arrow .return {
+    color: #d0c9bf;
+    text-align: center;
+    font-size: 11px;
+    opacity: 0.3;
+    letter-spacing: 1px;
+    margin-top: 15px;
+    margin-left: -2px;
+}
+.back-arrow .arrow-svg .st0, .project-arrow .arrow-svg .st0 {
+    fill: none;
+    stroke: #d0c9bf;
+    stroke-miterlimit: 10;
+    transition: all .2s;
+}
+.back-arrow:after, .project-arrow:after {
+    /*content: '';
+    position: absolute;
+    top: -5px;
+    left: -50px;
+    height: 25px;
+    width: 40px;
+    background: #000;
+    transition: all .3s;
+    border-radius: 20px;
+    box-shadow: 0px 0px 8px 4px #000;
+    pointer-events: none;*/
+}
+.back-arrow:hover .st0, .project-arrow:hover .st0 {
+    stroke: #FFB73A;
+    stroke-width: 2px;
+    transition: all .2s;
+}
+.back-arrow:hover:after, .project-arrow:hover:after {
+    /*left: 40px;
+    transition: all .3s ease-out;*/
+}
+.project-container {
+    opacity: 0;
+    visibility: hidden;
+ }
+.project-container .project-content {
+    width: 70%;
+    max-width: 1200px;
+    margin-left: 50%;
+    transform: translateX(-50%);
+    padding-top: 15vh;
+    position: absolute;
+    overflow: hidden;
+}
+.project-container .project-content .fixed {
+    position: fixed;
+    z-index: -1;
+}
+.project-container .project-content .back-arrow {
+    cursor: pointer;
+}
+.project-container .project-content .title {
+    color: #FFB73A;
+    font-size: 2rem;
+    letter-spacing: 5px;
+    margin-bottom: 3px;
+}
+.project-container .project-content .desc {
+    color: #fff;
+    margin-bottom: 60px;
+    text-transform: uppercase;
+    filter: #000000 brightness(2);
+}
+.project-container .project-content .info-content {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 60px;
+}
+.project-container .project-content .info-content .row {
+    width: 200px;
+}
+.project-container .project-content .info-content .row .sub-title {
+    color: rgba(255,255,255,0.3);
+    margin-bottom: 3px;
+}
+.project-container .project-content .info-content .row .content {
+    color: #fff;
+}
+.project-container .project-content .see-more {
+    display: flex;
+}
+.project-container .project-content .see-more .date {
+    color: #FFB73A;
+}
+.project-container .project-content .see-more .link {
+    color: #FFB73A;
+    cursor: pointer;
+    text-decoration: underline;
+    font-size: 14px;
+    margin-left: calc(50% - 80px);
+    position: fixed;
+    bottom: 50px;
+    opacity: .7;
+    transition: all .25s;
+}
+.project-container .project-content .see-more .bot-link {
+    margin-left: 50%;
+    transform: translateX(-50%);
+}
+.project-container .project-content .see-more .link:hover {
+    opacity: 1;
+    transition: all .25s;
+}
+.project-container .project-content .pic-container {
+    padding-top: 52vh;
+    padding-bottom: 20vh;
+    height: 28vh;
+    z-index: 9;
+    margin-top: -15vh;
+    overflow: scroll;
+}
+.project-container .project-content .pic-container .img-row {
+    width: 100%;
+    /*background: #000;*/
+    padding-bottom: 40px;
+}
+.project-container .project-content .pic-container .img-row img{
+    width: 100%;
+}
+/* CSS update end */
+
+
+.about-container .back-arrow {
+    width: 30px;
+    height: auto;
+    cursor: pointer;
+    position: absolute;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.about-container .back-arrow .arrow-svg .st0 {
+    fill: none;
+    stroke: #d0c9bf;
+    stroke-miterlimit: 10;
+    transition: all .3s;
+}
+.about-container .back-arrow .arrow-svg:hover .st0 {
+    stroke: #FFB73A;
+    transition: all .3s;
+}
+.progress {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    color: rgba(255,183,58,.3);
+    letter-spacing: 3px;
+    font-size: 10px;
+}
+.progress span {
+    color: rgba(255,183,58,.5);
+}
+.progress span:nth-child(1) {
+    animation: firstp 1s ease-out infinite;
+}
+.progress span:nth-child(2){
+    animation: secp 1s ease-out infinite;
+}
+.progress span:nth-child(3){
+    animation: thirdp 1s ease-out infinite;
+}
+@keyframes firstp {
+    0% {opacity: 1;}
+    33% {opacity: 0;}
+    66% {opacity: 0;}
+    100% {opacity: 0;}
+}
+@keyframes secp {
+    0% {opacity: 0;}
+    33% {opacity: 1;}
+    66% {opacity: 0;}
+    100% {opacity: 0;}
+}
+@keyframes thirdp {
+    0% {opacity: 0;}
+    33% {opacity: 0;}
+    66% {opacity: 1;}
+    100% {opacity: 0;}
+}
+
+
+.mobile {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: #000;
+    overflow: hidden;
+    z-index: 1000;
+    text-align: center;
+    display: none;
+}
+.mobile .progress {
+    color: #FFB73A;
+    position: initial;
+    margin-top: 10vh;
+    font-size: 1rem;
+}
+.mobile .contact {
+    padding-top: 20vh;
+    height: 4vh;
+    width: 200px;
+    display: flex;
+    justify-content: space-around;
+    opacity: .7;
+    margin-left: 50%;
+    transform: translate(-50%);
+}
+.mobile .contact .git-icon {
+    height: 23px;
+    width: 23px;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+.mobile .contact .git-icon .st0 {
+    fill: #d0c9bf;
+    transition: all .3s;
+}
+.mobile .contact .git-icon:hover .st0 {
+    transition: all .3s;
+    fill: #FFB73A;
+}
+.mobile .contact p {
+    color: #FFF;
+    font-family: Avenir-Light;
+    cursor: pointer;
+    transition: all .05s;
+}
+.mobile .contact p:hover {
+    color: #FFB73A;
+    transition: all .05s;
+}
+.mobile .contact p:hover .hidari {
+    margin-right: 7px;
+    transition: all .05s;
+}
+.mobile .contact p:hover .migi {
+    margin-right: 2px;
+    transition: all .05s;
+}
+.mobile .name {
+    padding-top: 17vh;
+    height: 18vh;
+}
+.mobile .name p {
+    font-size: 2rem;
+    color: #FFB73A;
+    letter-spacing: 1.5rem;
+    margin-left: 1rem;
+    font-family: Avenir-Light;
+}
+.mobile .formation {
+    margin-top: 30px;
+    color: #fff;
+    font-size: 14px;
+    letter-spacing: 4px;
+}
+@media screen and (max-width: 800px) {
+    .mobile {
+        /* display: block; */
+    }
+    .mobile-intro-container {
+        left: 50% !important;
+        bottom: 30% !important;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        transform: translateX(-50%);
+        opacity: .7;
+    }
+    .mobile-intro {
+        display: flex;
+        margin: 0px !important;
+        font-size: 12px !important;
+    }
+    .mobile-intro .txt-s {
+        margin: 0px 0px 0px 20px !important;
+    }
+
+    #main .contact {
+        transform: scale(1.1);
+        right: 30px;
+        bottom: 20px;
+    }
+    #main .txt-container.project-container-migi {
+        left: 48%;
+    }
+    #main .txt-container.project-container-hidari, #main .txt-container.project-container-migi {
+        bottom: 42vh;
+    }
+    #main .txt-container.project-container-hidari .title, #main .txt-container.project-container-migi .title {
+        font-size: 2rem;
+    }
+    #main .txt-container.project-container-hidari .desc, #main .txt-container.project-container-migi .desc {
+        font-size: 0.8em;
+    }
+    #main .txt-container.project-container-hidari .date, #main .txt-container.project-container-migi .date {
+        font-size: 0.7em;
+    }
+
+    /* ABOUT */
+    .about-container .name {
+        padding-top: 22vh;
+        height: 13vh;
+    }
+    .about-container .name p {
+        font-size: 1.2rem;
+        letter-spacing: .4rem;
+    }
+    .about-container .desc {
+        margin-top: 10vh;
+        width: 90%;
+    }
+    .about-container .designer {
+        font-size: 9px;
+    }
+
+    /* PROJECT */
+    .project-content {
+        width: 90%;
+    }
+    .project-content .fixed {
+        width: 100%;
+    }
+    .project-container .project-content .desc {
+        margin-bottom: 40px;
+    }
+    .project-container .project-content .info-content {
+        margin-bottom: 0px;
+        flex-wrap: wrap;
+    }
+    .project-container .project-content .info-content .row {
+        width: 50%;
+        margin-bottom: 20px;
+    }
+    .project-container .project-arrow {
+        top: 40px;
+    }
+}
