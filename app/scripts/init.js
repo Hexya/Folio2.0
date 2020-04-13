@@ -672,14 +672,17 @@ export default class App {
                             case 'Plane2':
                                 this.projectPage(thirdProjectContent);
                                 //window.history.pushState('Project', 'CanvasSound', '/Project_03');
+                                this.projectDeformContent = new ProjectDeformContent(this.scene , 2);
                                 break;
                             case 'Plane3':
                                 this.projectPage(fourthProjectContent);
                                 //window.history.pushState('Project', 'DataViz', '/Project_04');
+                                this.projectDeformContent = new ProjectDeformContent(this.scene , 3);
                                 break;
                             case 'Plane4':
                                 this.projectPage(fifthProjectContent);
                                 //window.history.pushState('Project', 'Ode', '/Project_05');
+                                this.projectDeformContent = new ProjectDeformContent(this.scene , 4);
                                 break;
                             default:
                         }
