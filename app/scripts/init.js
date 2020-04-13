@@ -642,7 +642,7 @@ export default class App {
 
             //CLICK ON PROJECT
             document.body.addEventListener('click', () => {
-                if(this.scene.position.z != 80 && this.inProject == false) {
+                if(this.scene.position.z != 80 && this.inProject == false && this.intersects[0].object.name != 'Plane4') { //Lokced click for in progress
                     if (this.intersects.length != 0 && this.intersects[0].object.name == 'Plane' + i) {
                         //console.log(this.intersects[0].object)
                         let title = document.querySelector('.txt-container')
