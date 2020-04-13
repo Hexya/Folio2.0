@@ -1,11 +1,12 @@
 import objFile from '../assets/models/modelObj.obj';
 import rockFile from '../assets/models/Morceaux_01.obj';
 import fontFile from '../assets/fonts/Avenir.json';
+import Ode from '../assets/img/project/OdeScreen.jpg';
 import RundFromLove from '../assets/img/project/RunFromLoveScreen.jpg';
 import SabineExp from '../assets/img/project/SabineScreen.jpg';
-import canvasSound from '../assets/img/project/CanvasSoundScreen.jpg';
+import Tinnitus from '../assets/img/project/TinnitusScreen.png';
 import DataViz from '../assets/img/project/DataVizScreen.jpg';
-import Ode from '../assets/img/project/OdeScreen.jpg';
+import canvasSound from '../assets/img/project/CanvasSoundScreen.jpg';
 import {TweenMax, Power2, TimelineLite} from 'gsap/TweenMax';
 import { GLTFLoader } from 'three/examples/js/loaders/GLTFLoader';
 let OrbitControls = require('three-orbit-controls')(THREE)
@@ -449,7 +450,7 @@ export default class App {
     }
 
     planeGeometry(planeNumber, i) {
-        let projectPic =[RundFromLove,SabineExp,canvasSound,DataViz,Ode]
+        let projectPic =[Ode,RundFromLove,Tinnitus,SabineExp,DataViz]
 
         const uniforms = {
             time: { type: "f", value: 0 },
@@ -642,7 +643,7 @@ export default class App {
 
             //CLICK ON PROJECT
             document.body.addEventListener('click', () => {
-                if(this.scene.position.z != 80 && this.inProject == false && this.intersects[0].object.name != 'Plane4') { //Lokced click for in progress
+                if(this.scene.position.z != 80 && this.inProject == false && this.intersects[0].object.name != 'Plane4') { //Locked click for in progress
                     if (this.intersects.length != 0 && this.intersects[0].object.name == 'Plane' + i) {
                         //console.log(this.intersects[0].object)
                         let title = document.querySelector('.txt-container')
@@ -667,12 +668,12 @@ export default class App {
                             case 'Plane1':
                                 this.projectPage(secProjectContent);
                                 //window.history.pushState('Project', 'SabineExp', '/Project_02');
-                                this.projectDeformContent = new ProjectDeformContent(this.scene , 1, 2);
+                                this.projectDeformContent = new ProjectDeformContent(this.scene , 1, 3);
                                 break;
                             case 'Plane2':
                                 this.projectPage(thirdProjectContent);
                                 //window.history.pushState('Project', 'CanvasSound', '/Project_03');
-                                this.projectDeformContent = new ProjectDeformContent(this.scene , 2, 1);
+                                this.projectDeformContent = new ProjectDeformContent(this.scene , 2, 3);
                                 break;
                             case 'Plane3':
                                 this.projectPage(fourthProjectContent);
@@ -682,7 +683,7 @@ export default class App {
                             case 'Plane4':
                                 this.projectPage(fifthProjectContent);
                                 //window.history.pushState('Project', 'Ode', '/Project_05');
-                                this.projectDeformContent = new ProjectDeformContent(this.scene , 4, 5);
+                                this.projectDeformContent = new ProjectDeformContent(this.scene , 4, 3);
                                 break;
                             default:
                         }

@@ -1,5 +1,5 @@
 module.exports = "<div class='project-info'>" +
-                     "<h2 class='title'>ODE</h2>" +
-                     "<p class='desc'>Three cam interact</p>" +
-                     "<p class='date'>Work in progress...</p>" +
+                     "<h2 class='title'>WLDLGHT</h2>" +
+                     "<p class='desc'>Japan Mapping travel</p>" +
+                     "<p class='date'>Website in progress...</p>" +
                  "</div>";

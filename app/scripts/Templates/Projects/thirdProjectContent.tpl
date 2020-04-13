@@ -7,8 +7,8 @@ module.exports = "<div class='project-arrow'>" +
         "</div>" +
         "<div class='project-content'>" +
             "<div class='fixed'>" +
-                "<p class='title'>CANVAS SOUND</p>" +
-                "<p class='desc'>A project animated under the influence of American rap of the 90s thanks to the canvas and the use of noise to track the intensity of the different tonalities of sound.</p>" +
+                "<p class='title'>Tinnitus</p>" +
+                "<p class='desc'>Tinnitus is a preventive experience against auditory trauma, in which the user faces tinnitus. He will have to perform the right combinations of keys to get rid of them and rediscover all the subtleties of the music.</p>" +
                 "<div class='info-content'>" +
                     "<div class='row'>" +
                         "<p class='sub-title'>CONTEXT</p>" +
@@ -20,23 +20,23 @@ module.exports = "<div class='project-arrow'>" +
                     "</div>" +
                     "<div class='row'>" +
                         "<p class='sub-title'>ROLE</p>" +
-                        "<p class='content'>ALL</p>" +
+                        "<p class='content'>DEVELOPER</p>" +
                     "</div>" +
                     "<div class='row'>" +
                         "<p class='sub-title'>TECHNOLOGIES</p>" +
-                        "<p class='content'>CANVAS</p>" +
-                        "<p class='content'>AUDIO API</p>" +
+                        "<p class='content'>UNITY</p>" +
+                        "<p class='content'>BLENDER</p>" +
                     "</div>" +
                 "</div>" +
                 "<div class='see-more'>" +
-                    "<p class='date'>21.12.18</p>" +
+                    "<p class='date'>04/11/2019</p>" +
                 "</div>" +
             "</div>" +
             "<div class='pic-container'>" +
                 //"<div class='img-row'><a class='link' href='http://hexya-online.com/CanvasSound/' target='_blank'><img src='../../../assets/img/project/CanvasSoundScreen.png'></a></div>" +
                 //"<div class='img-row'><a class='link' href='http://hexya-online.com/CanvasSound/' target='_blank'><img src='../../../assets/img/project/CanvasSoundScreenF.png'></a></div>" +
                 "<div class='see-more'>" +
-                    "<a class='link bot-link' href='http://hexya-online.com/CanvasSound/' target='_blank'>VISIT SITE</a>" +
+                    "<a class='link bot-link' href='http://designinteractif.gobelins.fr/2019/11/04/tinnitus/' target='_blank'>SEE MORE</a>" +
                 "</div>" +
             "</div>" +
         "</div>";

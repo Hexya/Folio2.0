@@ -7,8 +7,8 @@ module.exports = "<div class='project-arrow'>" +
         "</div>" +
         "<div class='project-content'>" +
             "<div class='fixed'>" +
-                "<p class='title'>RUN FROM LOVE</p>" +
-                "<p class='desc'>Live a funky experience in a universe that reacts to the music. Be careful, this may cause epileptic seizures, especially with sensitive people. ⚠️</p>" +
+                "<p class='title'>ODE</p>" +
+                "<p class='desc'>Ode, Narcissus and metamorphoses is an immersive and interactive web experience that engage the user in the heart of the myth of Narcissus. A poetic journey and an introspection in an organic world, looking for its inner beauty..</p>" +
                 "<div class='info-content'>" +
                     "<div class='row'>" +
                         "<p class='sub-title'>CONTEXT</p>" +
@@ -16,28 +16,29 @@ module.exports = "<div class='project-arrow'>" +
                     "</div>" +
                     "<div class='row'>" +
                         "<p class='sub-title'>TYPE</p>" +
-                        "<p class='content'>SOUND XP</p>" +
+                        "<p class='content'>EXPERIMENT</p>" +
                     "</div>" +
                     "<div class='row'>" +
                         "<p class='sub-title'>ROLE</p>" +
-                        "<p class='content'>ALL</p>" +
+                        "<p class='content'>DEVELOPER</p>" +
                     "</div>" +
                     "<div class='row'>" +
                         "<p class='sub-title'>TECHNOLOGIES</p>" +
                         "<p class='content'>THREEJS</p>" +
-                        "<p class='content'>AUDIO API</p>" +
+                        "<p class='content'>REACT</p>" +
+                        "<p class='content'>CANVAS</p>" +
                     "</div>" +
                 "</div>" +
                 "<div class='see-more'>" +
-                    "<p class='date'>21.12.18</p>" +
+                    "<p class='date'>24/06/2019</p>" +
                 "</div>" +
             "</div>" +
             "<div class='pic-container'>" +
-                //"<div class='img-row'><a class='link' href='http://hexya-online.com/RunFromLove/' target='_blank'><img src='./../../../assets/img/project/RunFromLoveScreen.png'></a></div>" +
-                //"<div class='img-row'><a class='link' href='http://hexya-online.com/RunFromLove/' target='_blank'><img src='../../../assets/img/project/RunFromLoveScreenF.png'></a></div>" +
-                //"<div class='img-row'><a class='link' href='http://hexya-online.com/RunFromLove/' target='_blank'><img src='../../../assets/img/project/RunFromLoveScreenS.png'></a></div>" +
+                //"<div class='img-row'><img src='../../../assets/img/project/OdeScreen.png'></div>" +
+                //"<div class='img-row'><img src='../../../assets/img/project/OdeScreenF.png'></div>" +
+                //"<div class='img-row'><img src='../../../assets/img/project/OdeScreenS.png'></div>" +
                 "<div class='see-more'>" +
-                    "<a class='link bot-link' href='http://hexya-online.com/RunFromLove/' target='_blank'>VISIT SITE</a>" +
+                    "<a class='link bot-link' href='https://hexya-online.com/Ode/' target='_blank'>SEE MORE</a>" +
+                    "</div>" +
                 "</div>" +
-            "</div>" +
-        "</div>";
+            "</div>";

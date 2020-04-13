@@ -1,9 +1,26 @@
 import {TimelineLite} from "gsap";
-import RundFromLove from '../assets/img/project/RunFromLoveScreen.jpg';
-import SabineExp from '../assets/img/project/SabineScreen.jpg';
-import canvasSound from '../assets/img/project/CanvasSoundScreen.jpg';
-import DataViz from '../assets/img/project/DataVizScreen.jpg';
+
 import Ode from '../assets/img/project/OdeScreen.jpg';
+import OdeB from '../assets/img/project/OdeScreenB.jpg';
+import OdeC from '../assets/img/project/OdeScreenC.jpg';
+import OdeD from '../assets/img/project/OdeScreenD.jpg';
+import OdeE from '../assets/img/project/OdeScreenE.jpg';
+
+import RundFromLove from '../assets/img/project/RunFromLoveScreen.jpg';
+import RundFromLoveB from '../assets/img/project/RunFromLoveScreenB.jpg';
+import RundFromLoveC from '../assets/img/project/RunFromLoveScreenC.jpg';
+
+import Tinnitus from '../assets/img/project/TinnitusScreen.png';
+import TinnitusB from '../assets/img/project/TinnitusScreenB.png';
+import TinnitusC from '../assets/img/project/TinnitusScreenC.png';
+
+import SabineExp from '../assets/img/project/SabineScreen.jpg';
+import SabineExpB from '../assets/img/project/SabineScreenB.jpg';
+import SabineExpC from '../assets/img/project/SabineScreenC.jpg';
+
+import DataViz from '../assets/img/project/DataVizScreen.jpg';
+import DataVizB from '../assets/img/project/DataVizScreenB.jpg';
+import DataVizC from '../assets/img/project/DataVizScreenC.jpg';
 
 export default class ProjectDeformContent {
 
@@ -23,11 +40,11 @@ export default class ProjectDeformContent {
         
         this.projectNumber = number;
         this.projects = [
-            [RundFromLove,RundFromLove,RundFromLove,RundFromLove,RundFromLove],
-            [SabineExp,SabineExp,SabineExp],
-            [canvasSound,canvasSound,canvasSound],
-            [DataViz,DataViz,DataViz],
-            [Ode,Ode,Ode,Ode,Ode]
+            [Ode,OdeB,OdeC,OdeD,OdeE],
+            [RundFromLove,RundFromLoveB,RundFromLoveC],
+            [Tinnitus,TinnitusB,TinnitusC],
+            [SabineExp,SabineExpB,SabineExpC],
+            [DataViz,DataVizB,DataVizC]
             ]
 
         //mobile
