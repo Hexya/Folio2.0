@@ -38,7 +38,7 @@ module.exports = "<div class='project-arrow'>" +
                 //"<div class='img-row'><img src='../../../assets/img/project/OdeScreenF.png'></div>" +
                 //"<div class='img-row'><img src='../../../assets/img/project/OdeScreenS.png'></div>" +
                 "<div class='see-more'>" +
-                    "<a class='link bot-link' href='https://hexya-online.com/Ode/' target='_blank'>SEE MORE</a>" +
+                    "<a class='link bot-link' href='https://hexya-online.com/Ode/' target='_blank'>VISIT SITE</a>" +
                     "</div>" +
                 "</div>" +
             "</div>";

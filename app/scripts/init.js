@@ -56,7 +56,7 @@ export default class App {
 
         this.index = 0;
         this.timerStep = 0;
-        this.startTimer = 10; //10 Fast 1 Normal
+        this.startTimer = 1; //10 Fast 1 Normal
         this.scrolls = [];
         this.duration = .5;
         this.delay = 0;
