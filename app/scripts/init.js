@@ -662,27 +662,27 @@ export default class App {
                             case 'Plane0':
                                 this.projectPage(firstProjectContent);
                                 //window.history.pushState('Project', 'RunFromLove', '/Project_01');
-                                this.projectDeformContent = new ProjectDeformContent(this.scene, 0);
+                                this.projectDeformContent = new ProjectDeformContent(this.scene, 0, 5);
                                 break;
                             case 'Plane1':
                                 this.projectPage(secProjectContent);
                                 //window.history.pushState('Project', 'SabineExp', '/Project_02');
-                                this.projectDeformContent = new ProjectDeformContent(this.scene , 1);
+                                this.projectDeformContent = new ProjectDeformContent(this.scene , 1, 2);
                                 break;
                             case 'Plane2':
                                 this.projectPage(thirdProjectContent);
                                 //window.history.pushState('Project', 'CanvasSound', '/Project_03');
-                                this.projectDeformContent = new ProjectDeformContent(this.scene , 2);
+                                this.projectDeformContent = new ProjectDeformContent(this.scene , 2, 1);
                                 break;
                             case 'Plane3':
                                 this.projectPage(fourthProjectContent);
                                 //window.history.pushState('Project', 'DataViz', '/Project_04');
-                                this.projectDeformContent = new ProjectDeformContent(this.scene , 3);
+                                this.projectDeformContent = new ProjectDeformContent(this.scene , 3 , 3);
                                 break;
                             case 'Plane4':
                                 this.projectPage(fifthProjectContent);
                                 //window.history.pushState('Project', 'Ode', '/Project_05');
-                                this.projectDeformContent = new ProjectDeformContent(this.scene , 4);
+                                this.projectDeformContent = new ProjectDeformContent(this.scene , 4, 5);
                                 break;
                             default:
                         }

@@ -7,10 +7,10 @@ import Ode from '../assets/img/project/OdeScreen.jpg';
 
 export default class ProjectDeformContent {
 
-    constructor(scene, number) {
+    constructor(scene, number, imgNumber) {
 
         this.scene = scene;
-        this.planeImgNumber = 3;
+        this.planeImgNumber = imgNumber;
         this.groupPlaneImg = new THREE.Group();
 
         this.scrollOffset = 0;
@@ -23,11 +23,11 @@ export default class ProjectDeformContent {
         
         this.projectNumber = number;
         this.projects = [
-            [RundFromLove,RundFromLove,RundFromLove],
+            [RundFromLove,RundFromLove,RundFromLove,RundFromLove,RundFromLove],
             [SabineExp,SabineExp,SabineExp],
             [canvasSound,canvasSound,canvasSound],
             [DataViz,DataViz,DataViz],
-            [Ode,Ode,Ode]
+            [Ode,Ode,Ode,Ode,Ode]
             ]
 
         //mobile
@@ -114,7 +114,7 @@ export default class ProjectDeformContent {
         `
     
       for(let i=0;i<this.planeImgNumber;i++) {
-        let geometry = new THREE.PlaneBufferGeometry(50, 37, 32, 32);
+        let geometry = new THREE.PlaneBufferGeometry(60, 37, 32, 32);
         let material = new THREE.ShaderMaterial({
           transparent: true, 
           fragmentShader,
@@ -126,9 +126,9 @@ export default class ProjectDeformContent {
         mesh.material.uniforms = {
             uTime: { value: 0 },
             uTexture: { value: 0 },
-            uMeshSize: { value: new THREE.Vector2(1, 1) },
+            uMeshSize: { value: new THREE.Vector2(1.1, 1) },
             uImageSize: { value: new THREE.Vector2(0, 0) },
-            uScale: { value: 0.75 },
+            uScale: { value: 1. },
             uVelo: this.velocityUniform,
             uAlpha: { value: 0.1 }
         }
@@ -150,7 +150,9 @@ export default class ProjectDeformContent {
           this.planes[i].material.uniforms.uTexture.value = texture;
           this.planes[i].material.uniforms.uImageSize.value = [img.naturalWidth, img.naturalHeight];
           this.planes[i].position.y = -60 * i;
-          i%2 ? this.planes[i].position.x += 2 : this.planes[i].position.x -= 3;
+          let rand = Math.random() * (1.3 - 0.7) + 0.7;
+          this.planes[i].scale.set(rand,rand,rand)
+          i%2 ? this.planes[i].position.x += 3 : this.planes[i].position.x -= 3;
 
           TweenMax.to(this.planes[i].material.uniforms.uAlpha, 1, {value:1, ease:Circ.easeInOut}).delay(1);
 

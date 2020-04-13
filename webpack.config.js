@@ -90,7 +90,7 @@ module.exports = function(env) {
                     },
                 ],
             },{
-                test: [/\.mp3$/, /\.png$/, /\.dae$/, /\.jpg$/, /\.obj$/, /\.fbx$/, /\.glb$/, /\.gltf$/, /\.json$/, /\.dae$/, /\.mtl$/, /\.fbx$/],
+                test: [/\.mp3$/, /\.png$/, /\.dae$/, /\.jpg$/, /\.gif$/, /\.obj$/, /\.fbx$/, /\.glb$/, /\.gltf$/, /\.json$/, /\.dae$/, /\.mtl$/, /\.fbx$/],
                 use: ['file-loader?name=[path][name].[hash].[ext]']
             },{
                 test:[/\.vert$/,/\.frag$/],
