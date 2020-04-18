@@ -291,6 +291,7 @@ audio {
     stroke: #d0c9bf;
     stroke-miterlimit: 10;
     transition: all .2s;
+    stroke-width: 2px;
 }
 .back-arrow:after, .project-arrow:after {
     /*content: '';
@@ -307,7 +308,7 @@ audio {
 }
 .back-arrow:hover .st0, .project-arrow:hover .st0 {
     stroke: #FFB73A;
-    stroke-width: 2px;
+    stroke-width: 3px;
     transition: all .2s;
 }
 .back-arrow:hover:after, .project-arrow:hover:after {

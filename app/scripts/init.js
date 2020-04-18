@@ -5,7 +5,7 @@ import Ode from '../assets/img/project/OdeScreen.jpg';
 import RundFromLove from '../assets/img/project/RunFromLoveScreen.jpg';
 import SabineExp from '../assets/img/project/SabineScreen.jpg';
 import Tinnitus from '../assets/img/project/TinnitusScreen.png';
-import DataViz from '../assets/img/project/DataVizScreen.jpg';
+import JapMap from '../assets/img/project/WLDLGHTScreen.jpg';
 import canvasSound from '../assets/img/project/CanvasSoundScreen.jpg';
 import {TweenMax, Power2, TimelineLite} from 'gsap/TweenMax';
 import { GLTFLoader } from 'three/examples/js/loaders/GLTFLoader';
@@ -56,11 +56,20 @@ export default class App {
 
         this.index = 0;
         this.timerStep = 0;
-        this.startTimer = 1; //10 Fast 1 Normal
+        this.startTimer = 10; //10 Fast 1 Normal
         this.scrolls = [];
         this.duration = .5;
         this.delay = 0;
         this.waterDeform = 0;
+
+        this.groupWallPlanes = [];
+        
+        this.delta = 0;
+        this.backRockScroll = false;
+
+        this.rotateCam = true;
+        this.movementX = 0;
+        this.movementY = 0;
 
         //Load
         this.percentLoad = 0;
@@ -230,6 +239,7 @@ export default class App {
                     }
                 })
                 this.box3 = new THREE.Box3().setFromObject(modelObj) //Max and min of object
+                console.log(modelObj.position)
                 this.groupWall.add( modelObj );
                 this.scene.add( this.groupWall );
                 this.modelObj = modelObj;
@@ -416,9 +426,12 @@ export default class App {
                 }
             }
             this.scrolls.push(this.scrolls.length)
+            this.backRockScroll = false;
         } else {
             //Move BackRock project
-            this.backRock.position.y += event.deltaY/150;            
+            //this.backRock.position.y += event.deltaY/150;    
+            this.delta += event.deltaY * 0.0075;
+            this.backRockScroll = true;
         }
     }
 
@@ -447,10 +460,12 @@ export default class App {
             TweenMax.to(this.planeGroup.children[i].material.uniforms.uFrequency, .7, {value: 0., ease:Sine.easeInOut})
             TweenMax.to(this.planeGroup.children[i].material.uniforms.uAmplitude, .7, {value: 0., ease:Sine.easeInOut})
         }
+        this.movementX -= event.movementX/40000;
+        this.movementY -= event.movementY/40000;
     }
 
     planeGeometry(planeNumber, i) {
-        let projectPic =[Ode,RundFromLove,Tinnitus,SabineExp,DataViz]
+        let projectPic =[Ode,RundFromLove,Tinnitus,SabineExp,JapMap]
 
         const uniforms = {
             time: { type: "f", value: 0 },
@@ -521,6 +536,7 @@ export default class App {
         planeNumber.name = 'Plane'+i;
 
         this.planeGroup.add(planeNumber);
+        this.groupWallPlanes.push(planeNumber)
         this.groupWall.add(this.planeGroup);
     }
 
@@ -531,25 +547,25 @@ export default class App {
         const size = getPerspectiveSize(this.camera, this.camera.position.z); //Camera coord
         this.reScale = (size.width / (Math.abs(this.box3.max.x) + Math.abs(this.box3.min.x))) * 1.2;
         //DEPART ESTATE
-        this.groupWall.getObjectByName('Plane0').material.map = new THREE.TextureLoader().load( RundFromLove );
-        this.groupWall.getObjectByName('Plane0').scale.set(this.reScale*10.3, this.reScale*10.3, this.reScale*10.3)
-        this.groupWall.getObjectByName('Plane0').position.set(-window.innerWidth/width*10,-10*(this.reScale*93),-1);
+        this.groupWallPlanes[0].material.map = new THREE.TextureLoader().load( RundFromLove );
+        this.groupWallPlanes[0].scale.set(this.reScale*10.3, this.reScale*10.3, this.reScale*10.3)
+        this.groupWallPlanes[0].position.set(-window.innerWidth/width*10,-10*(this.reScale*93),-1);
 
-        this.groupWall.getObjectByName('Plane1').material.map = new THREE.TextureLoader().load( SabineExp );
-        this.groupWall.getObjectByName('Plane1').scale.set(this.reScale*10.3, this.reScale*10.3, this.reScale*10.3)
-        this.groupWall.getObjectByName('Plane1').position.set(window.innerWidth/width*10,-10*(this.reScale*133),-1);
+        this.groupWallPlanes[1].material.map = new THREE.TextureLoader().load( SabineExp );
+        this.groupWallPlanes[1].scale.set(this.reScale*10.3, this.reScale*10.3, this.reScale*10.3)
+        this.groupWallPlanes[1].position.set(window.innerWidth/width*10,-10*(this.reScale*133),-1);
 
-        this.groupWall.getObjectByName('Plane2').material.map = new THREE.TextureLoader().load( canvasSound );
-        this.groupWall.getObjectByName('Plane2').scale.set(this.reScale*10.35, this.reScale*10.35, this.reScale*10.35)
-        this.groupWall.getObjectByName('Plane2').position.set(-window.innerWidth/width*6.5,-10*(this.reScale*171),-1);
+        this.groupWallPlanes[2].material.map = new THREE.TextureLoader().load( canvasSound );
+        this.groupWallPlanes[2].scale.set(this.reScale*10.35, this.reScale*10.35, this.reScale*10.35)
+        this.groupWallPlanes[2].position.set(-window.innerWidth/width*6.5,-10*(this.reScale*171),-1);
 
-        this.groupWall.getObjectByName('Plane3').material.map = new THREE.TextureLoader().load( DataViz );
-        this.groupWall.getObjectByName('Plane3').scale.set(this.reScale*13, this.reScale*13, this.reScale*13)
-        this.groupWall.getObjectByName('Plane3').position.set(window.innerWidth/width*3,-10*(this.reScale*211),-1);
+        this.groupWallPlanes[3].material.map = new THREE.TextureLoader().load( JapMap );
+        this.groupWallPlanes[3].scale.set(this.reScale*13, this.reScale*13, this.reScale*13)
+        this.groupWallPlanes[3].position.set(window.innerWidth/width*3,-10*(this.reScale*211),-1);
 
-        this.groupWall.getObjectByName('Plane4').material.map = new THREE.TextureLoader().load( Ode );
-        this.groupWall.getObjectByName('Plane4').scale.set(this.reScale*10.35, this.reScale*10.35, this.reScale*10.35)
-        this.groupWall.getObjectByName('Plane4').position.set(-window.innerWidth/width*12,-10*(this.reScale*258),-1);
+        this.groupWallPlanes[4].material.map = new THREE.TextureLoader().load( Ode );
+        this.groupWallPlanes[4].scale.set(this.reScale*10.35, this.reScale*10.35, this.reScale*10.35)
+        this.groupWallPlanes[4].position.set(-window.innerWidth/width*12,-10*(this.reScale*258),-1);
     }
 
     //TWO PLANE BEGIN
@@ -616,8 +632,22 @@ export default class App {
     }
     //REQUEST ANIMATION LOOP
     render() {
+        //Rotate camera mouse moove
+        if(this.rotateCam) {
+            this.camera.rotation.x += (this.movementX - this.camera.rotation.x)*0.05;
+            this.camera.rotation.y += (this.movementY - this.camera.rotation.y)*0.05;
+        } else {
+            this.camera.rotation.x += (0 - this.camera.rotation.x)*0.05;
+            this.camera.rotation.y += (0 - this.camera.rotation.y)*0.05;
+        }
+
+        //Back rock scroll
+        if(this.backRockScroll ==true) {
+            this.backRock.position.y += (this.delta-this.backRock.position.y)*0.04; //Smooth scroll
+        }
+
+        //Update Scroll deform
         if(this.inProjectUpdate == true) {
-            //Update Scroll deform
             this.projectDeformContent.loop();
             TweenMax.to(bloomPass, .3, {strength:0.4,threshold: 0.75, ease:Sine.easeOut}).delay(1);
         }
@@ -654,6 +684,7 @@ export default class App {
                             .addPause().pause()
                         tl.play()
                         this.inProjectUpdate = true;
+                        this.rotateCam = false;
 
                         //BACKROCK OPACITY
                         TweenMax.to(this.backRock.children[0].material, .8, {opacity: 1, ease:Sine.easeInOut})
@@ -720,6 +751,7 @@ export default class App {
                     this.inProjectUpdate = false;
                     this.projectDeformContent.remove()
                     TweenMax.to(bloomPass, 1, {strength:1,threshold: 0, ease:Sine.easeOut}).delay(1);
+                    this.rotateCam = true;
 
                     //REMOVE CONTENT
                     setTimeout(()=> {
