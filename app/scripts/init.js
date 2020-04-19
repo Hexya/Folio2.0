@@ -1,5 +1,6 @@
 import objFile from '../assets/models/modelObj.obj';
 import rockFile from '../assets/models/Morceaux_01.obj';
+import rockFile2 from '../assets/models/Morceaux_02.obj';
 import fontFile from '../assets/fonts/Avenir.json';
 import Ode from '../assets/img/project/OdeScreen.jpg';
 import RundFromLove from '../assets/img/project/RunFromLoveScreen.jpg';
@@ -7,8 +8,10 @@ import SabineExp from '../assets/img/project/SabineScreen.jpg';
 import Tinnitus from '../assets/img/project/TinnitusScreen.png';
 import JapMap from '../assets/img/project/WLDLGHTScreen.jpg';
 import canvasSound from '../assets/img/project/CanvasSoundScreen.jpg';
-import {TweenMax, Power2, TimelineLite} from 'gsap/TweenMax';
+import { TweenMax, Power2, TimelineLite } from 'gsap/TweenMax';
 import { GLTFLoader } from 'three/examples/js/loaders/GLTFLoader';
+import { clamp, map } from '../scripts/utils/math'
+
 let OrbitControls = require('three-orbit-controls')(THREE)
 
 import 'three/examples/js/postprocessing/EffectComposer';
@@ -42,6 +45,8 @@ let thirdProjectContent = require('./Templates/Projects/thirdProjectContent.tpl'
 let fourthProjectContent = require('./Templates/Projects/fourthProjectContent.tpl');
 let fifthProjectContent = require('./Templates/Projects/fifthProjectContent.tpl');
 
+let templates = [firstProjectContent, secProjectContent, thirdProjectContent, fourthProjectContent, fifthProjectContent];
+
 let composer, renderPass, bloomPass, chromaticAberration, chromaticAberrationPass;
 let params = {
     exposure: 0,
@@ -54,18 +59,28 @@ export default class App {
 
     constructor() {
 
+        this.lastIndex = 0;
         this.index = 0;
         this.timerStep = 0;
         this.startTimer = 10; //10 Fast 1 Normal
         this.scrolls = [];
+        this.wallAnchors = [];
         this.duration = .5;
         this.delay = 0;
         this.waterDeform = 0;
-
+        this.wallTargetPosition = 0;
+        
         this.groupWallPlanes = [];
         
+        //Device
+        this.fx = typeof InstallTrigger !== 'undefined';
+        this.device;
+        this.scrollOffset = 0;
+
+        //scroll
         this.delta = 0;
         this.backRockScroll = false;
+        this.lockToIndex = false;
 
         this.rotateCam = true;
         this.movementX = 0;
@@ -77,8 +92,10 @@ export default class App {
         this.loadRoackB = 0;
         this.loadWall = 0;
 
+        //Page
         this.inProject = false;
         this.inProjectUpdate = false;
+        this.inAbout = false;
 
         //Mobile
         this.beginMove = [];
@@ -91,6 +108,7 @@ export default class App {
 
         //THREE SCENE
         this.container = document.querySelector( '#main' );
+        this.textContainer = this.container.querySelector('.txt-container');
         document.body.appendChild( this.container );
 
         this.camera = new THREE.PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 0.01, 10000 );
@@ -227,7 +245,7 @@ export default class App {
     rockLoader() {
         this.groupWall = new THREE.Group();
         let wallLoader = new THREE.OBJLoader();
-        wallLoader.load( rockFile, ( modelObj )=> {
+        wallLoader.load( rockFile2, ( modelObj )=> {
                 modelObj.traverse( function (child) {
                     if (child instanceof THREE.Mesh) {
                         child.material = new THREE.MeshPhongMaterial({color: 0xfafbfc, specular: 0xf00, shininess: 100,});
@@ -239,7 +257,6 @@ export default class App {
                     }
                 })
                 this.box3 = new THREE.Box3().setFromObject(modelObj) //Max and min of object
-                console.log(modelObj.position)
                 this.groupWall.add( modelObj );
                 this.scene.add( this.groupWall );
                 this.modelObj = modelObj;
@@ -293,7 +310,29 @@ export default class App {
     //SCROLL
     addEvents() {
         window.addEventListener('wheel', this.mouseWheel.bind(this));
+        window.addEventListener('wheel', this.getDevice.bind(this));
         window.addEventListener('touchmove',this.touchMove.bind(this));
+        document.body.addEventListener('click', this.goToproject.bind(this));
+    }
+    getDevice(e) {
+        this.scrollOffset = 0;
+        let isTouchPad = e.wheelDeltaY ? e.wheelDeltaY === -3 * e.deltaY : e.deltaMode === 0
+        let chrome = e.wheelDeltaY;
+        this.scrollOffset += e.deltaY;
+        if(chrome) {//Chrome
+            if(isTouchPad) {//touchpad
+              this.device = "ct";
+            } else {//mouse
+              this.device = "cm";
+            }
+          }
+          if(!chrome && e.deltaY) {//Mozilla
+            if(isTouchPad) {//touchpad
+              this.device = "mt";
+            } else {//mouse
+              this.device = "mm";
+            }
+          }
     }
 
     //PROFIL
@@ -324,82 +363,24 @@ export default class App {
             new TypingEffect('.about-container .designer','0.05','+=1.5');
             tl.play();
             tltxt.play();
+            this.inAbout = true;
         })
         document.querySelector('.back-arrow').addEventListener('click',()=> {
             tl.reverse();
             tltxt.reverse();
+            this.inAbout = false;
         })
     }
 
-    onNextWheel() {
-        const index = (this.index + 1) %6;//NUMBER OF STEP
-        this.goToIndex(index);
-    }
-    onPrevWheel() {
-        let index = (this.index - 1) %6;//NUMBER OF STEP
-        if(index == -1) {
-            index = this.index + 5;
-        }
-        this.goToIndex(index);
-    }
-
-    next() {
-        window.clearTimeout(this.carouselTimeout);
-        this.animating = true;
-        this.startCarouselTimeout();
-
-        const add = Math.max(0, 1.52 - this.duration);
-        const delay = this.scrolls.length > 5 ? add : this.delay; //25
-        TweenMax.delayedCall(delay, () => {
-            this.animating = false;
-            this.scrolls = [];
-        })
-    }
-
-    startCarouselTimeout() {
-        this.carouselTimeout = setTimeout(() => {
-            this.onNextWheel()
-        }, 100)
-    }
-
-    previous() {
-        window.clearTimeout(this.carouselTimeout);
-
-        this.animating = true;
-        this.backCarouselTimeout();
-
-        const add = Math.max(0, 1.52 - this.duration);
-        const delay = this.scrolls.length > 5 ? add : this.delay; //25
-        TweenMax.delayedCall(delay, () => {
-            this.animating = false;
-            this.scrolls = [];
-        })
-    }
-
-    backCarouselTimeout() {
-        this.carouselTimeout = setTimeout(() => {
-            this.onPrevWheel()
-        }, 50)
-    }
     touchMove(e) {
         //IF NOT IN PROJECT OR ABOUT MOBILE
         if(document.querySelector('.project-content')== null) {
             if(this.beginMove.length < 1) {
-                this.beginMove.push(e.changedTouches["0"].clientY)
-              }
-              
-              this.movement = this.beginMove[0]-e.changedTouches["0"].clientY;
+              this.beginMove.push(e.changedTouches["0"].clientY)
+            }
+            let movement = this.beginMove[0]-e.changedTouches["0"].clientY;this.progressMove += movement;
 
-                if(this.movement < 10 && this.movement > -80) {
-                    setTimeout(()=> {
-                        this.movement = "0";
-                    },1000)
-                    if(this.movement<-30) {
-                        this.previous()     
-                    }else {
-                        this.next()
-                    }
-                }
+            this.wallTargetPosition += movement * 0.008;
         } else {
             //Move BackRock project       
             if(this.beginMove.length < 1) {
@@ -409,44 +390,42 @@ export default class App {
                 this.beginMove.shift();
               },1000)
 
-             this.movement = this.beginMove[0]-e.changedTouches["0"].clientY;
-             this.backRock.position.y -= this.movement/500
+            
+
+            let lockSCroll = this.projectDeformContent.getLimit()
+            if(!lockSCroll) {
+                this.movement = this.beginMove[0]-e.changedTouches["0"].clientY;
+                this.delta += this.movement/600;
+                this.backRockScroll = true;
+            }   
         }
     }
 
     mouseWheel(event) {
         //IF NOT IN PROJECT OR ABOUT
-        if(document.querySelector('.project-content')== null) {
-            const delta = event.deltaY
-            if (!this.animating) {
-                if (delta > 0) {
-                    this.next()
-                } else if (delta < 0) {
-                    this.previous()
-                }
+        if(document.querySelector('.project-content')== null) {  // HOME
+            if(this.device == "mm") {//mozilla mouse
+                this.wallTargetPosition += event.deltaY * .9;
+            } else {//others
+                this.wallTargetPosition += event.deltaY * .03;
             }
-            this.scrolls.push(this.scrolls.length)
-            this.backRockScroll = false;
+            //Remove fontMesh onScroll
+            if(this.wallTargetPosition > 20) {
+                this.fontMesh.material.opacity = 0;
+                //TweenMax.to(this.fontMesh.material, .5, { opacity: 0, ease:Circ.easeInOut})
+            }
         } else {
             //Move BackRock project
-            //this.backRock.position.y += event.deltaY/150;    
-            this.delta += event.deltaY * 0.0075;
-            this.backRockScroll = true;
+            //this.backRock.position.y += event.deltaY/150;  
+            let lockSCroll = this.projectDeformContent.getLimit()
+            if(!lockSCroll) {
+                this.delta += event.deltaY * 0.0075;
+                this.backRockScroll = true;
+            }   
         }
     }
 
-    goToIndex(index) {
-        this.index = index;
-        const y = this.getWallPositionForIndex(index);
-        TweenMax.to(this.groupWall.position, 2, { y, ease:Circ.easeInOut })
-
-        //TEXT DISAPEAR
-        if(index != 0) {
-            TweenMax.to(this.fontMesh.material,2, { opacity: 0, ease:Circ.easeInOut})
-        } else {
-            TweenMax.to(this.fontMesh.material,2, { opacity: 1, ease:Circ.easeInOut})
-        }
-    }
+   
 
     onMouseMove( event ) {
         this.mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
@@ -534,6 +513,7 @@ export default class App {
         planeMatS.opacity = 0.3;
         planeNumber = new THREE.Mesh( planeGeo, planeMatS );
         planeNumber.name = 'Plane'+i;
+        planeNumber.index = i;
 
         this.planeGroup.add(planeNumber);
         this.groupWallPlanes.push(planeNumber)
@@ -589,7 +569,6 @@ export default class App {
             .from(this.scene.position,2, {z:80, ease:Circ.easeInOut},5/this.startTimer)
     }
 
-
     //AFTER ELEMENT LOADED
     loaded() {
         //Temps de transition affichage text apres le load à 100%;
@@ -628,35 +607,89 @@ export default class App {
         tlRow.staggerFrom(document.querySelectorAll('.row'),0.5, {autoAlpha:0},'0.5','+=1')
              .staggerFrom(document.querySelectorAll('.img-row'),1, {autoAlpha:0},'0.5','-=0.5')
 
-
+        // AJOUTE LE CLICK
+        document.querySelector('.project-arrow').addEventListener('click', () => {
+            
+            window.history.pushState('Home', 'Home', '/');
+            let project = document.querySelector('.project-container');
+            let tlOpacity = new TimelineLite();//Transition page
+            //Remove txt
+            tlOpacity.to(document.querySelectorAll('.row'),0.25, {autoAlpha:0},'0.5','+=1')
+                        .to(document.querySelectorAll('.img-row'),0.5, {autoAlpha:0},'0.5','-=0.5')
+                        .to(project, .25, {opacity:0, visibility:'hidden', ease:Circ.easeInOut}, 1, '+=.5')
+                        .addPause().pause();
+            tlOpacity.play();
+            //BACKROCK OPACITY
+            TweenMax.to(this.backRock.children[0].material, .7, {opacity: 0, ease:Sine.easeInOut})
+            //Replace camera
+            let title = document.querySelector('.txt-container')
+            let tl = new TimelineLite();
+            tl.to(this.scene.position, 2, {z:0, ease:Circ.easeInOut}) //UNZOOM
+                .to(title, .2, {visibility:'visible', ease:Circ.easeInOut},'-=1') //REAPPEAR TITLE
+                .to(title, 1, {opacity:1, ease:Circ.easeInOut}, '-=1.2' ) //REAPPEAR TITLE
+                .addPause().pause();
+            tl.play();
+            //console.log('Unzoom project')
+            
+            //Remove Project Deform
+            this.inProjectUpdate = false;
+            this.projectDeformContent.remove()
+            TweenMax.to(bloomPass, 1, {strength:1,threshold: 0, ease:Sine.easeOut}).delay(1);
+            this.rotateCam = true;
+            
+            //REMOVE CONTENT
+            setTimeout(()=> {
+                this.inProject = false;
+                document.querySelector('.project-container').innerHTML = ''
+            },1500)
+        })
+              
     }
-    //REQUEST ANIMATION LOOP
-    render() {
-        //Rotate camera mouse moove
-        if(this.rotateCam) {
-            this.camera.rotation.x += (this.movementX - this.camera.rotation.x)*0.05;
-            this.camera.rotation.y += (this.movementY - this.camera.rotation.y)*0.05;
-        } else {
-            this.camera.rotation.x += (0 - this.camera.rotation.x)*0.05;
-            this.camera.rotation.y += (0 - this.camera.rotation.y)*0.05;
-        }
 
-        //Back rock scroll
-        if(this.backRockScroll ==true) {
-            this.backRock.position.y += (this.delta-this.backRock.position.y)*0.04; //Smooth scroll
-        }
+    goToproject(ev) {
+        if (!this.intersecting || this.inProject) return;
+        
+        const firstIntersect = this.intersects[0];
 
-        //Update Scroll deform
-        if(this.inProjectUpdate == true) {
-            this.projectDeformContent.loop();
-            TweenMax.to(bloomPass, .3, {strength:0.4,threshold: 0.75, ease:Sine.easeOut}).delay(1);
+        if (this.inProject == false && firstIntersect.object.index != 4) { //Locked click for in progress
+            //console.log(firstIntersect.object)
+            let title = this.textContainer
+            let tl = new TimelineLite();
+            tl.to(this.scene.position, 2, {z:80, ease:Circ.easeInOut}) //ZOOM
+                .to(title, 2, {opacity:0, ease:Circ.easeInOut}, '-=2') // DISAPPEAR TITLE
+                .to(title, 1, {visibility:'hidden', ease:Circ.easeInOut}) // DISAPPEAR TITLE
+                .addPause().pause()
+            tl.play()
+            this.inProjectUpdate = true;
+            this.rotateCam = false;
+
+            //BACKROCK OPACITY
+            TweenMax.to(this.backRock.children[0].material, .8, {opacity: 1, ease:Sine.easeInOut})
+            
+            let index = firstIntersect.object.index;
+
+            if (typeof index !== 'undefined') {
+                this.projectPage(templates[index]);
+                this.projectDeformContent = new ProjectDeformContent(this.scene, index);
+                this.inProject = true;
+            }
+            
         }
-        //RAYCASTER
+    }
+
+    raycast() {
         this.raycaster.setFromCamera( this.mouse, this.camera );
         // calculate objects intersecting the picking ray
         this.intersects = this.raycaster.intersectObjects( this.planeGroup.children );
+        if (this.intersects.length <= 0) {
+            document.body.style.cursor = "default";
+            this.intersecting = false;
+            return;
+        }
 
-        document.body.style.cursor = "default";
+        this.intersecting = true;
+
+       
         for ( let i = 0; i < this.intersects.length; i++ ) {
 
             //POWER LIGHT ON HOVER
@@ -671,57 +704,7 @@ export default class App {
             TweenMax.to(this.intersects[0].object.material.uniforms.uFrequency, .7, {value: 15., ease:Sine.easeInOut})
             TweenMax.to(this.intersects[0].object.material.uniforms.uAmplitude, .7, {value: .15, ease:Sine.easeInOut})
 
-            //CLICK ON PROJECT
-            document.body.addEventListener('click', () => {
-                if(this.scene.position.z != 80 && this.inProject == false && this.intersects[0].object.name != 'Plane4') { //Locked click for in progress
-                    if (this.intersects.length != 0 && this.intersects[0].object.name == 'Plane' + i) {
-                        //console.log(this.intersects[0].object)
-                        let title = document.querySelector('.txt-container')
-                        let tl = new TimelineLite();
-                        tl.to(this.scene.position, 2, {z:80, ease:Circ.easeInOut}) //ZOOM
-                            .to(title, 2, {opacity:0, ease:Circ.easeInOut}, '-=2') // DISAPPEAR TITLE
-                            .to(title, 1, {visibility:'hidden', ease:Circ.easeInOut}) // DISAPPEAR TITLE
-                            .addPause().pause()
-                        tl.play()
-                        this.inProjectUpdate = true;
-                        this.rotateCam = false;
 
-                        //BACKROCK OPACITY
-                        TweenMax.to(this.backRock.children[0].material, .8, {opacity: 1, ease:Sine.easeInOut})
-
-                        //console.log('Zoom project')
-                        switch (this.intersects[0].object.name) {
-                            case 'Plane0':
-                                this.projectPage(firstProjectContent);
-                                //window.history.pushState('Project', 'RunFromLove', '/Project_01');
-                                this.projectDeformContent = new ProjectDeformContent(this.scene, 0, 5);
-                                break;
-                            case 'Plane1':
-                                this.projectPage(secProjectContent);
-                                //window.history.pushState('Project', 'SabineExp', '/Project_02');
-                                this.projectDeformContent = new ProjectDeformContent(this.scene , 1, 3);
-                                break;
-                            case 'Plane2':
-                                this.projectPage(thirdProjectContent);
-                                //window.history.pushState('Project', 'CanvasSound', '/Project_03');
-                                this.projectDeformContent = new ProjectDeformContent(this.scene , 2, 3);
-                                break;
-                            case 'Plane3':
-                                this.projectPage(fourthProjectContent);
-                                //window.history.pushState('Project', 'DataViz', '/Project_04');
-                                this.projectDeformContent = new ProjectDeformContent(this.scene , 3 , 3);
-                                break;
-                            case 'Plane4':
-                                this.projectPage(fifthProjectContent);
-                                //window.history.pushState('Project', 'Ode', '/Project_05');
-                                this.projectDeformContent = new ProjectDeformContent(this.scene , 4, 3);
-                                break;
-                            default:
-                        }
-                        this.inProject = true;
-                    }
-                }
-            })
             //REMOVE PROJECT PAGE
             if (this.inProject == true) {
                 this.inProject = false;
@@ -738,7 +721,7 @@ export default class App {
                     //BACKROCK OPACITY
                     TweenMax.to(this.backRock.children[0].material, .7, {opacity: 0, ease:Sine.easeInOut})
                     //Replace camera
-                    let title = document.querySelector('.txt-container')
+                    let title = this.textContainer
                     let tl = new TimelineLite();
                     tl.to(this.scene.position, 2, {z:0, ease:Circ.easeInOut}) //UNZOOM
                         .to(title, .2, {visibility:'visible', ease:Circ.easeInOut},'-=1') //REAPPEAR TITLE
@@ -761,23 +744,9 @@ export default class App {
             }
         }
 
-
-        let time = Date.now()/1000;// rayon
-        this.dirLight.position.x += Math.cos(time)/2;
-        this.dirLight.position.y += Math.sin(time)/2;
-        //this.dirLight.position.z += Math.tan(time);
-        this.targetObject.position.x += Math.cos(time)/2;
-        this.targetObject.position.y += Math.sin(time)/2;
-
-
-        this.baseLight.position.x -= Math.cos(time)/2;
-        this.baseLight.position.y -= Math.sin(time)/2;
-
-        //RENDER
-        //this.renderer.render( this.scene, this.camera ); //Default
-        composer.render();
     }
 
+    //REQUEST ANIMATION LOOP
     resizeParameters() {
         const size = getPerspectiveSize(this.camera, this.camera.position.z); //Camera coord
         this.reScale = (size.width / (Math.abs(this.box3.max.x) + Math.abs(this.box3.min.x))) * 1.2;
@@ -811,6 +780,33 @@ export default class App {
             this.resizeParameters();
             this.planePosition();
         }
+
+        // this.lockToIndex = false;
+        this.getWallPositions();
+        this.wallTargetPosition = this.wallAnchors[this.lastIndex];
+
+    }
+
+    getWallPositions() {
+        if (!this.wallObj) return;
+        this.wallAnchors[0] = 0;
+        
+        for (let i = 0; i<this.wallObj.children.length; i++) {
+            const child = this.wallObj.children[i]
+            let name = child.name;
+            name = name.substring(0,11);
+            if(name.indexOf('Pos') > -1) {
+                name = name.replace('Project', '');
+                let index = parseInt(name, 10);
+                if (isNaN(index)) continue;
+                let y = child.geometry.attributes.position.array[1];
+                if(this.fx) {
+                    this.wallAnchors[index] = y * -this.reScale + (index * 5); //Mozilla + (index * 5)
+                } else {
+                    this.wallAnchors[index] = y * -this.reScale; //Chrome
+                }
+            }
+        }
     }
 
     setWallPosition() {
@@ -823,37 +819,21 @@ export default class App {
     getWallPositionForIndex(index) {
         if (index === 0) {
             //NEW CONTENT
-            document.querySelector('.txt-container').classList.remove('project-container-migi');
-            document.querySelector('.txt-container').classList.add('mobile-intro-container');
-            document.querySelector('.txt-container').innerHTML = firstSceneTemplate;
+            this.textContainer.classList.remove('project-container-migi');
+            this.textContainer.classList.add('mobile-intro-container');
+            this.textContainer.innerHTML = firstSceneTemplate;
             new TypingEffect('.hidari .txt-f','0.05','+=2','.hidari .txt-s','.migi .txt-f','-=0', '.migi .txt-s','-=0');
 
             return 0
         }
         else {
             if(document.querySelector('.mobile-intro-container')) {
-                document.querySelector('.txt-container').classList.remove('mobile-intro-container');
+                this.textContainer.classList.remove('mobile-intro-container');
             }
-            for (let i = 0; i<this.wallObj.children.length; i++) {
-                const child = this.wallObj.children[i]
-                let name = child.name;
-                name = name.substring(0,11);
-                if(name == 'Project'+index+'Pos') {
-                    const v3 = new THREE.Vector3(
-                        child.geometry.attributes.position.array[0],//x
-                        child.geometry.attributes.position.array[1],//y
-                        child.geometry.attributes.position.array[2]//z
-                    )
-                    v3.y *= -this.reScale
-                    this.infoProject(index);
-                    return v3.y
-                }
-            }
-
         }
     }
 
-    infoProject(index) {
+    animateInfoProject(index) {
         switch ('Project'+index) {
             case 'Project1':
                 this.newContent(secSceneTemplate, 'migi', 'hidari');
@@ -875,10 +855,10 @@ export default class App {
     }
 
     newContent(sceneTemplateNumber, newSide, removalSide) {
-        document.querySelector('.txt-container').classList.remove('project-container-'+ removalSide);
-        document.querySelector('.txt-container').classList.add('project-container-'+ newSide);
-        document.querySelector('.txt-container').innerHTML = sceneTemplateNumber;
-        new TypingEffect('.project-info .title','0.05','+=2','.project-info .desc','.project-info .date','-=1.5');
+        this.textContainer.classList.remove('project-container-'+ removalSide);
+        this.textContainer.classList.add('project-container-'+ newSide);
+        this.textContainer.innerHTML = sceneTemplateNumber;
+        new TypingEffect('.project-info .title','0.05', .1,'.project-info .desc','.project-info .date', .6);
     }
 
     addComposer() {
@@ -993,5 +973,135 @@ export default class App {
         composer.addPass(chromaticAberrationPass);
         composer.addPass(antialiasPass);
         antialiasPass.renderToScreen = true;
+    }
+
+    updateWall() {
+        if (!this.modelObj) return;
+        let y = clamp(this.wallTargetPosition, this.wallAnchors[0], this.wallAnchors[this.wallAnchors.length - 1] + 10);
+        if (isNaN(y)) return;
+        this.wallTargetPosition = y;
+        let delta = this.wallTargetPosition - this.groupWall.position.y;
+        this.groupWall.position.y += delta * .1;
+
+        if (Math.abs(delta) < .5 && !this.lockToIndex) {
+            this.lockToIndex = true;
+            let index = this.getCloserIndex();
+            
+            // set position
+            let targetY = this.wallAnchors[index];
+            this.wallTargetPosition = targetY;
+            
+            // animationIn
+            this.animateBlockIn(index)
+        } else if (Math.abs(delta) > .5 && this.lockToIndex) {
+            this.lockToIndex = false;
+            this.animateBlockOut();
+        }
+    }
+
+    getCloserIndex() {
+        let current = this.groupWall.position.y;
+
+        // 0 is purpose to be the closest
+        let index = 0;
+        let minDistance = Infinity;
+
+        for (let i = 0, l = this.wallAnchors.length; i < l; i++) {
+            let distance = Math.abs(current - this.wallAnchors[i]);
+            if (distance < minDistance) {
+                minDistance = distance;
+                index = i;
+            }
+        }
+
+
+        // scroll to 1 if 10% + & go back if x < 80%
+        let remap = map(current, 0, this.wallAnchors[1], 0, 1);
+        if (index === 0) {
+            if (remap > .1 && remap < 1.) {
+                index = 1;
+            }
+        } else if (index === 1 && remap < .7) {
+            index = 0;
+        }
+
+        return index
+    }
+
+    animateBlockIn(index) {
+        this.lastIndex = index;
+        if (this.lastAnimateInIndex === index) return;
+        this.lastAnimateInIndex = index;
+
+        TweenMax.to(this.textContainer, .3, { autoAlpha: 1 }, Cubic.easeOut);
+        
+        if (index === 0) {
+            this.textContainer.classList.remove('project-container-migi');
+            this.textContainer.classList.add('mobile-intro-container');
+            this.textContainer.innerHTML = firstSceneTemplate;
+            new TypingEffect('.hidari .txt-f','0.05', 0,'.hidari .txt-s','.migi .txt-f','-=0', '.migi .txt-s', 0);
+            TweenMax.to(this.fontMesh.material,.5, { opacity: 1, ease:Circ.easeInOut})// fontMesh appear
+        } else {
+            if(document.querySelector('.mobile-intro-container')) {
+                this.textContainer.classList.remove('mobile-intro-container');
+                this.fontMesh.material.opacity = 0;
+                //TweenMax.to(this.fontMesh.material,.5, { opacity: 0, ease:Circ.easeInOut})// Remove fontMesh
+            }
+            this.animateInfoProject(index);
+        }
+    }
+
+    animateBlockOut() {
+        if (this.lastAnimateInIndex === null) return;
+        this.lastAnimateInIndex = null;
+        TweenMax.to(this.textContainer, .3, { autoAlpha: 0 }, Cubic.easeOut);
+    }
+
+    render() {
+        //Rotate camera mouse moove
+        if(this.rotateCam) {
+            this.camera.rotation.x += (this.movementX - this.camera.rotation.x)*0.05;
+            this.camera.rotation.y += (this.movementY - this.camera.rotation.y)*0.05;
+        } else {
+            this.camera.rotation.x += (0 - this.camera.rotation.x)*0.05;
+            this.camera.rotation.y += (0 - this.camera.rotation.y)*0.05;
+        }
+
+        //Back rock scroll
+        if(this.backRockScroll == true) {
+            this.backRock.position.y += (this.delta-this.backRock.position.y)*0.04; //Smooth scroll
+        }
+
+        //Update Scroll deform
+        if(this.inProjectUpdate == true) {
+            this.projectDeformContent.loop();
+            TweenMax.to(bloomPass, .3, {strength:0.4,threshold: 0.75, ease:Sine.easeOut}).delay(1);
+        } 
+        
+        // COUPE LE DANS ABOUT this.inAbout
+        if (!this.inProject && !this.inAbout) {
+            this.raycast();
+            this.updateWall();
+        }
+
+        //RAYCASTER
+
+
+
+        // update lights
+        let time = Date.now()/1000;// rayon
+        this.dirLight.position.x += Math.cos(time)/2;
+        this.dirLight.position.y += Math.sin(time)/2;
+        //this.dirLight.position.z += Math.tan(time);
+        this.targetObject.position.x += Math.cos(time)/2;
+        this.targetObject.position.y += Math.sin(time)/2;
+
+
+        this.baseLight.position.x -= Math.cos(time)/2;
+        this.baseLight.position.y -= Math.sin(time)/2;
+
+        //RENDER
+        //this.renderer.render( this.scene, this.camera ); //Default
+        composer.render();
     }
 }

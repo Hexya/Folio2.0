@@ -22,12 +22,20 @@ import DataViz from '../assets/img/project/DataVizScreen.jpg';
 import DataVizB from '../assets/img/project/DataVizScreenB.jpg';
 import DataVizC from '../assets/img/project/DataVizScreenC.jpg';
 
+const PROJECTS = [
+  [Ode,OdeB,OdeC,OdeD,OdeE],
+  [RundFromLove,RundFromLoveB,RundFromLoveC],
+  [Tinnitus,TinnitusB,TinnitusC],
+  [SabineExp,SabineExpB,SabineExpC],
+  [DataViz,DataVizB,DataVizC]
+]
+
 export default class ProjectDeformContent {
 
-    constructor(scene, number, imgNumber) {
+    constructor(scene, index) {
 
         this.scene = scene;
-        this.planeImgNumber = imgNumber;
+
         this.groupPlaneImg = new THREE.Group();
 
         this.scrollOffset = 0;
@@ -38,18 +46,14 @@ export default class ProjectDeformContent {
         this.velocityUniform = { value: 0 };
         this.planes = [];
         
-        this.projectNumber = number;
-        this.projects = [
-            [Ode,OdeB,OdeC,OdeD,OdeE],
-            [RundFromLove,RundFromLoveB,RundFromLoveC],
-            [Tinnitus,TinnitusB,TinnitusC],
-            [SabineExp,SabineExpB,SabineExpC],
-            [DataViz,DataVizB,DataVizC]
-            ]
+        this.index = index;
+        this.lockScroll = false;
+
+        this.currentProject = PROJECTS[this.index];
+        this.planeImgNumber = this.currentProject.length;
 
         //mobile
         this.beginMove = [];
-        this.progressMove = 0;
         this.setupMesh();
         this.setupEventListeners();
 
@@ -153,7 +157,7 @@ export default class ProjectDeformContent {
         this.planes.push(mesh);
         const loader = new THREE.TextureLoader()
         let img = document.querySelector('.project-img')
-        this.texture = loader.load(this.projects[this.projectNumber][i], (texture) => {
+        this.texture = loader.load(this.currentProject[i], (texture) => {
           texture.minFilter = THREE.LinearFilter
           texture.generateMipmaps = false
           /*var repeatX, repeatY;
@@ -181,6 +185,7 @@ export default class ProjectDeformContent {
       this.scene.add( this.groupPlaneImg ); 
     }
 
+
      setupEventListeners() {
         document.addEventListener("wheel", this.scrollDevice.bind(this), false);
         document.addEventListener("DOMMouseScroll", this.scrollDevice.bind(this), false);
@@ -189,13 +194,13 @@ export default class ProjectDeformContent {
       
       touchMove(e) {
           let scrollLimitTop = -2;
-          let onScrollLimit = scrollLimitTop + 0.1;
+          let onScrollLimit = scrollLimitTop + 0.2; // 0.1
           let scrollLimitBot = (this.planes.length-1)*20 + 2;//82 To adjust
         
           if(this.beginMove.length < 1) {
             this.beginMove.push(e.changedTouches["0"].clientY)
           }
-          let movement = this.beginMove[0]-e.changedTouches["0"].clientY;this.progressMove += movement;
+          let movement = this.beginMove[0]-e.changedTouches["0"].clientY;
           if(this.scrollOffset >= scrollLimitTop){//Scroll limite
             this.scrollOffset += movement * 0.03;
               if(this.scrollOffset > onScrollLimit && this.scrollOffset <= scrollLimitBot) { //Deform only if not on limit
@@ -222,6 +227,7 @@ export default class ProjectDeformContent {
           
           //Scroll & Deformation power
           if(this.scrollOffset >= scrollLimitTop){//Scroll limite
+              this.lockScroll = false;
                if(chrome) {
                   if(isTouchPad) {
                     this.scrollOffset += e.deltaY * 0.02;
@@ -253,12 +259,18 @@ export default class ProjectDeformContent {
                   }
                 }   
               } else {//this.scrollOffset Outside limit
-                this.scrollOffset += (onScrollLimit - this.scrollOffset) * 0.5;
+                this.lockScroll = true;
+                this.scrollOffset += (onScrollLimit - this.scrollOffset) * 0.1;//0.5
               }
               if(this.scrollOffset >= scrollLimitBot){
+                this.lockScroll = true;
                 this.scrollOffset += (scrollLimitBot - 0.1 - this.scrollOffset) * 0.5;
               }  
       }
+
+    getLimit() {
+      return this.lockScroll;
+    }
       
     loop() {
         //this.scrollOffset

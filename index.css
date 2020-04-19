@@ -393,7 +393,7 @@ audio {
     height: 28vh;
     z-index: 9;
     margin-top: -15vh;
-    overflow: scroll;
+    overflow: none;
 }
 .project-container .project-content .pic-container .img-row {
     width: 100%;
