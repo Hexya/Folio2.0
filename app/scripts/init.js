@@ -321,14 +321,8 @@ export default class App {
         window.addEventListener('wheel', this.getDevice.bind(this));
         window.addEventListener('touchmove',this.touchMove.bind(this));
         document.body.addEventListener('click', this.goToproject.bind(this));
-        document.body.addEventListener('click', this.stopPropagation.bind(this));
     }
-    stopPropagation() {
-        this.stopProp = true;
-        setTimeout(()=>{
-            this.stopProp = false;
-        },1000)
-    }
+
     getDevice(e) {
         this.scrollOffset = 0;
         let isTouchPad = e.wheelDeltaY ? e.wheelDeltaY === -3 * e.deltaY : e.deltaMode === 0
@@ -378,6 +372,7 @@ export default class App {
              .pause();
 
         document.querySelector('.contact p').addEventListener('click',(e)=> {
+
             e.stopPropagation();
             new TypingEffect('.about-container .formation','0.05','+=1');
             new TypingEffect('.about-container .desc','0.015','+=0');
@@ -650,7 +645,7 @@ export default class App {
     }
 
     goToproject(ev) {
-        if (!this.intersecting || this.inProject || !this.stopProp) return;
+        if (!this.intersecting || this.inProject) return;
         
         const firstIntersect = this.intersects[0];
 
