@@ -80,6 +80,7 @@ export default class App {
         
         //Device
         this.fx = typeof InstallTrigger !== 'undefined';
+        this.isMacLike = /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform);
         this.device;
         this.scrollOffset = 0;
 
@@ -111,6 +112,7 @@ export default class App {
         this.raycaster = new THREE.Raycaster();
         this.intersects = [];
         this.mouse = new THREE.Vector2();
+        this.stopProp = false;
 
         //THREE SCENE
         this.container = document.querySelector( '#main' );
@@ -319,12 +321,25 @@ export default class App {
         window.addEventListener('wheel', this.getDevice.bind(this));
         window.addEventListener('touchmove',this.touchMove.bind(this));
         document.body.addEventListener('click', this.goToproject.bind(this));
+        document.body.addEventListener('click', this.stopPropagation.bind(this));
+    }
+    stopPropagation() {
+        this.stopProp = true;
+        setTimeout(()=>{
+            this.stopProp = false;
+        },1000)
     }
     getDevice(e) {
         this.scrollOffset = 0;
         let isTouchPad = e.wheelDeltaY ? e.wheelDeltaY === -3 * e.deltaY : e.deltaMode === 0
         let chrome = e.wheelDeltaY;
         this.scrollOffset += e.deltaY;
+        // let isMacLike = /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform);
+        // if(isMacLike) {
+        //     console.log('MAC DEVICE DETECTED')
+        // } else {
+        //     console.log('WINDOWS DEVICE DETECTED')
+        // }
         if(chrome) {//Chrome
             if(isTouchPad) {//touchpad
               this.device = "ct";
@@ -384,9 +399,11 @@ export default class App {
             if(this.beginMove.length < 1) {
               this.beginMove.push(e.changedTouches["0"].clientY)
             }
-            let movement = this.beginMove[0]-e.changedTouches["0"].clientY;this.progressMove += movement;
-
-            this.wallTargetPosition += movement * 0.02;
+            let movement = this.beginMove[0]-e.changedTouches["0"].clientY;
+            this.wallTargetPosition += movement * 0.1; //real 0.1 for test 0.02
+            setTimeout(()=> {
+                this.beginMove = [];
+              },500)
         } else {
             //Move BackRock project       
             if(this.beginMove.length < 1) {
@@ -410,10 +427,22 @@ export default class App {
     mouseWheel(event) {
         //IF NOT IN PROJECT OR ABOUT
         if(document.querySelector('.project-content')== null) {  // HOME
-            if(this.device == "mm") {//mozilla mouse
-                this.wallTargetPosition += event.deltaY * .9;
-            } else {//others
-                this.wallTargetPosition += event.deltaY * .03;
+            if(!this.isMacLike) {
+                if(this.device == "mm") {//mozilla mouse
+                    this.wallTargetPosition += event.deltaY * 1.8;
+                } 
+                if(this.device == "cm") {//chrome mouse
+                    this.wallTargetPosition += event.deltaY * 0.08;
+                } 
+                if(this.device != "mm" && this.device != "cm") {//others
+                    this.wallTargetPosition += event.deltaY * .03;
+                }
+            } else {
+                if(this.device == "mm") {//mozilla mouse
+                    this.wallTargetPosition += event.deltaY * .9;
+                } else {//others
+                    this.wallTargetPosition += event.deltaY * .03;
+                }
             }
             //Remove fontMesh onScroll
             if(this.wallTargetPosition > 20) {
@@ -425,7 +454,11 @@ export default class App {
             //this.backRock.position.y += event.deltaY/150;  
             let lockSCroll = this.projectDeformContent.getLimit()
             if(!lockSCroll) {
-                this.delta += event.deltaY * 0.0075;
+                if(!this.isMacLike && this.device == 'mm') {
+                    this.delta += event.deltaY * 0.275;
+                } else {
+                    this.delta += event.deltaY * 0.0075;
+                }
                 this.backRockScroll = true;
             }   
         }
@@ -617,7 +650,7 @@ export default class App {
     }
 
     goToproject(ev) {
-        if (!this.intersecting || this.inProject) return;
+        if (!this.intersecting || this.inProject || !this.stopProp) return;
         
         const firstIntersect = this.intersects[0];
 
@@ -945,7 +978,7 @@ export default class App {
             this.textContainer.classList.add('mobile-intro-container');
             this.textContainer.innerHTML = firstSceneTemplate;
             new TypingEffect('.hidari .txt-f','0.05', 0,'.hidari .txt-s','.migi .txt-f','-=0', '.migi .txt-s', 0);
-            TweenMax.to(this.fontMesh.material,.5, { opacity: 1, ease:Circ.easeInOut})// fontMesh appear
+            if(this.fontMesh) TweenMax.to(this.fontMesh.material,.5, { opacity: 1, ease:Circ.easeInOut})// fontMesh appear
         } else {
             if(document.querySelector('.mobile-intro-container')) {
                 this.textContainer.classList.remove('mobile-intro-container');

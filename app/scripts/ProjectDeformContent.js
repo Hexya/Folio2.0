@@ -179,7 +179,6 @@ export default class ProjectDeformContent {
           //scene.getObjectByName('plane'+ i) == planes[i])
           this.planes[i].material.uniforms.uTextureLoad.value = 1.;
           this.planes[i].material.uniforms.uTexture.value = texture;
-          console.log(texture)
           //console.log(img.naturalWidth,img.naturalHeight)
           this.planes[i].material.uniforms.uImageSize.value = [1174, 881]; //naturalWidth, naturalHeight
           this.planes[i].position.y = -60 * i;
@@ -214,9 +213,9 @@ export default class ProjectDeformContent {
           }
           let movement = this.beginMove[0]-e.changedTouches["0"].clientY;
           if(this.scrollOffset >= scrollLimitTop){//Scroll limite
-            this.scrollOffset += movement * 0.03;
+            this.scrollOffset += movement * 0.05;
               if(this.scrollOffset > onScrollLimit && this.scrollOffset <= scrollLimitBot) { //Deform only if not on limit
-                this.velocityTarget = movement * 0.3;
+                this.velocityTarget = movement * 0.5;
               }
           } else {//this.scrollOffset Outside limit
             this.scrollOffset += (onScrollLimit - this.scrollOffset) * 0.5;
@@ -236,6 +235,7 @@ export default class ProjectDeformContent {
           let onScrollLimit = scrollLimitTop + 0.1;
           let scrollLimitBot = (this.planes.length-1)*20 + 2;//82 To adjust
           let chrome = e.wheelDeltaY;
+          let isMacLike = /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform);
           
           //Scroll & Deformation power
           if(this.scrollOffset >= scrollLimitTop){//Scroll limite
@@ -243,30 +243,46 @@ export default class ProjectDeformContent {
                if(chrome) {
                   if(isTouchPad) {
                     this.scrollOffset += e.deltaY * 0.02;
-                  } else {
-                    this.scrollOffset += e.deltaY * 0.01;
+                  } else { //mouse
+                    if(!isMacLike) {// windows
+                      this.scrollOffset += e.deltaY * 0.02;
+                    } else {
+                      this.scrollOffset += e.deltaY * 0.01;
+                    }
                   }
                 }
                 if(!chrome && e.deltaY) {
                   if(isTouchPad) {
                     this.scrollOffset += e.deltaY * 0.02;
-                  } else {
-                    this.scrollOffset += e.deltaY * 0.5;
+                  } else { //mouse
+                    if(!isMacLike) {// windows
+                      this.scrollOffset += e.deltaY * 0.7;
+                    } else {
+                      this.scrollOffset += e.deltaY * 0.5;
+                    }
                   }
                 }
                 if(this.scrollOffset > onScrollLimit && this.scrollOffset <= scrollLimitBot) { //Deform only if not on limit
                   if(chrome) {
                     if(isTouchPad) {
                       this.velocityTarget = e.deltaY * 0.6;
-                    } else {
-                      this.velocityTarget = e.deltaY * 0.2;
+                    } else { //mouse
+                      if(!isMacLike) {// windows
+                        this.velocityTarget = e.deltaY * 0.3;
+                      } else {
+                        this.velocityTarget = e.deltaY * 0.2;
+                      }
                     }
                   }
                   if(!chrome && e.deltaY) {
                     if(isTouchPad) {
                       this.velocityTarget = e.deltaY * 0.6;
-                    } else {
-                      this.velocityTarget = e.deltaY * 5.0;
+                    } else { //mouse
+                      if(!isMacLike) {// windows
+                        this.velocityTarget = e.deltaY * 6.0;
+                      } else {
+                        this.velocityTarget = e.deltaY * 5.0;
+                      }
                     }
                   }
                 }   

@@ -24,6 +24,7 @@ body {
 * {
     margin: 0;
     padding: 0;
+    outline: none;
 }
 *::-webkit-scrollbar {
     width: 0px;
@@ -118,6 +119,13 @@ audio {
 }
 #main .txt-container.project-container-migi {
     left: 58%;
+}
+#main .stop-prop {
+    position: absolute;
+    height: 160px;
+    width: 110px;
+    right: 10px;
+    bottom: 10px;
 }
 #main .contact {
     height: 130px;
