@@ -386,7 +386,7 @@ export default class App {
             }
             let movement = this.beginMove[0]-e.changedTouches["0"].clientY;this.progressMove += movement;
 
-            this.wallTargetPosition += movement * 0.008;
+            this.wallTargetPosition += movement * 0.02;
         } else {
             //Move BackRock project       
             if(this.beginMove.length < 1) {

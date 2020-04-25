@@ -165,7 +165,6 @@ export default class ProjectDeformContent {
     
         this.planes.push(mesh);
         const loader = new THREE.TextureLoader()
-        let img = document.querySelector('.project-img')
         this.texture = loader.load(this.currentProject[i], (texture) => {
 
           texture.minFilter = THREE.LinearFilter
@@ -180,7 +179,9 @@ export default class ProjectDeformContent {
           //scene.getObjectByName('plane'+ i) == planes[i])
           this.planes[i].material.uniforms.uTextureLoad.value = 1.;
           this.planes[i].material.uniforms.uTexture.value = texture;
-          this.planes[i].material.uniforms.uImageSize.value = [img.naturalWidth, img.naturalHeight];
+          console.log(texture)
+          //console.log(img.naturalWidth,img.naturalHeight)
+          this.planes[i].material.uniforms.uImageSize.value = [1174, 881]; //naturalWidth, naturalHeight
           this.planes[i].position.y = -60 * i;
           let rand = Math.random() * (1.3 - 0.7) + 0.7;
           this.planes[i].scale.set(rand,rand,rand)
