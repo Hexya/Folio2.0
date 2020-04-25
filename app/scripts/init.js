@@ -113,10 +113,12 @@ export default class App {
         this.intersects = [];
         this.mouse = new THREE.Vector2();
         this.stopProp = false;
+        this.ignore = document.querySelector('.about-container')
 
         //THREE SCENE
         this.container = document.querySelector( '#main' );
         this.textContainer = this.container.querySelector('.txt-container');
+        this.contact = this.container.querySelector('.contact');
         document.body.appendChild( this.container );
 
         this.camera = new THREE.PerspectiveCamera( 55, window.innerWidth / window.innerHeight, 0.01, 10000 );
@@ -622,10 +624,19 @@ export default class App {
             //Replace camera
             let title = document.querySelector('.txt-container')
             let tl = new TimelineLite();
-            tl.to(this.scene.position, 2, {z:0, ease:Circ.easeInOut}) //UNZOOM
+            if(window.matchMedia('(max-width:800px)').matches) {
+                tl.to(this.scene.position, 2, {z:0, ease:Circ.easeInOut}) //UNZOOM
+                    .to(title, .2, {visibility:'visible', ease:Circ.easeInOut},'-=1') //REAPPEAR TITLE
+                    .to(title, 1, {opacity:1, ease:Circ.easeInOut}, '-=1.2' ) //REAPPEAR TITLE
+                    .to(this.contact, .2, {visibility:'visible', ease:Circ.easeInOut},'-=1.3') //REAPPEAR CONTACT
+                    .to(this.contact, 1, {opacity:0.7, ease:Circ.easeInOut}, '-=1.5') // REAPPEAR CONTACT 
+                    .addPause().pause();
+            } else {
+                tl.to(this.scene.position, 2, {z:0, ease:Circ.easeInOut}) //UNZOOM
                 .to(title, .2, {visibility:'visible', ease:Circ.easeInOut},'-=1') //REAPPEAR TITLE
                 .to(title, 1, {opacity:1, ease:Circ.easeInOut}, '-=1.2' ) //REAPPEAR TITLE
                 .addPause().pause();
+            }
             tl.play();
             //console.log('Unzoom project')
             
@@ -634,7 +645,7 @@ export default class App {
             this.projectDeformContent.remove()
             TweenMax.to(bloomPass, 1, {strength:1,threshold: 0, ease:Sine.easeOut}).delay(1);
             this.rotateCam = true;
-            
+
             //REMOVE CONTENT
             setTimeout(()=> {
                 this.inProject = false;
@@ -647,16 +658,31 @@ export default class App {
     goToproject(ev) {
         if (!this.intersecting || this.inProject) return;
         
+        //Lock about mobile click
+        let target = ev.target
+        if(target === this.ignore || this.ignore.contains(target)){
+            return;
+        }
+        
         const firstIntersect = this.intersects[0];
 
         if (this.inProject == false && firstIntersect.object.index != 4) { //Locked click for in progress
             //console.log(firstIntersect.object)
             let title = this.textContainer
             let tl = new TimelineLite();
-            tl.to(this.scene.position, 2, {z:80, ease:Circ.easeInOut}) //ZOOM
-                .to(title, 2, {opacity:0, ease:Circ.easeInOut}, '-=2') // DISAPPEAR TITLE
-                .to(title, 1, {visibility:'hidden', ease:Circ.easeInOut}) // DISAPPEAR TITLE
-                .addPause().pause()
+            if(window.matchMedia('(max-width:800px)').matches) {
+                tl.to(this.scene.position, 2, {z:80, ease:Circ.easeInOut}) //ZOOM
+                    .to(title, 2, {opacity:0, ease:Circ.easeInOut}, '-=2') // DISAPPEAR TITLE
+                    .to(title, 1, {visibility:'hidden', ease:Circ.easeInOut}) // DISAPPEAR TITLE
+                    .to(this.contact, 1, {opacity:0, ease:Circ.easeInOut}, '-=2') // DISAPPEAR CONTACT 
+                    .to(this.contact, 1, {visibility:'hidden', ease:Circ.easeInOut}) // DISAPPEAR CONTACT
+                    .addPause().pause()
+            } else {
+                tl.to(this.scene.position, 2, {z:80, ease:Circ.easeInOut}) //ZOOM
+                    .to(title, 2, {opacity:0, ease:Circ.easeInOut}, '-=2') // DISAPPEAR TITLE
+                    .to(title, 1, {visibility:'hidden', ease:Circ.easeInOut}) // DISAPPEAR TITLE
+                    .addPause().pause()
+            }
             tl.play()
             this.inProjectUpdate = true;
             this.rotateCam = false;

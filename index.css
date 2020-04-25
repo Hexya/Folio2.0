@@ -611,10 +611,10 @@ audio {
     }
 
     /* PROJECT */
-    .project-content {
+    .project-container .project-content {
         width: 90%;
     }
-    .project-content .fixed {
+    .project-container .project-content .fixed {
         width: 100%;
     }
     .project-container .project-content .desc {
