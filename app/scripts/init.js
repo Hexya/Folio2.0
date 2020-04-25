@@ -965,8 +965,8 @@ export default class App {
     render() {
         //Rotate camera mouse moove
         if(this.rotateCam) {
-            this.camera.rotation.x += (this.movementX - this.camera.rotation.x)*0.05;
-            this.camera.rotation.y += (this.movementY - this.camera.rotation.y)*0.05;
+            this.camera.rotation.x += (this.movementY - this.camera.rotation.x)*0.05;
+            this.camera.rotation.y += (this.movementX - this.camera.rotation.y)*0.05;
         } else {
             this.camera.rotation.x += (0 - this.camera.rotation.x)*0.05;
             this.camera.rotation.y += (0 - this.camera.rotation.y)*0.05;
