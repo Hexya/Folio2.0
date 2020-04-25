@@ -656,13 +656,9 @@ export default class App {
     }
 
     goToproject(ev) {
-        if (!this.intersecting || this.inProject) return;
-        
-        //Lock about mobile click
-        let target = ev.target
-        if(target === this.ignore || this.ignore.contains(target)){
-            return;
-        }
+        let target = ev.target;
+        //Lock no intersect / in project / about mobile click
+        if (!this.intersecting || this.inProject ||target === this.ignore || this.ignore.contains(target)) return;
         
         const firstIntersect = this.intersects[0];
 
