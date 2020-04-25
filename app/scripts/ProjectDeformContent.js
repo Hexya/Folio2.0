@@ -113,6 +113,8 @@ export default class ProjectDeformContent {
         uniform float uScale;
         uniform float uAlpha;
         
+        uniform float uTextureLoad;
+        
         varying vec2 vUv;
         
         void main() {
@@ -121,16 +123,22 @@ export default class ProjectDeformContent {
           vec2 texCenter = vec2(0.5);
           vec2 texUv = backgroundCoverUv(uMeshSize, uImageSize, uv);
           vec2 texScale = (texUv - texCenter) * uScale + texCenter;
-          vec4 texture = texture2D(uTexture, texScale);
+          if(uTextureLoad == 1.){
+             vec4 texture = texture2D(uTexture, texScale);
         
           texScale.y += 0.0025 * uVelo;
           if(uv.y < 1.) texture.g = texture2D(uTexture, texScale).g;
         
           texScale.y += 0.0020 * uVelo;
           if(uv.y < 1.) texture.b = texture2D(uTexture, texScale).b;
-        
+  
+
           gl_FragColor = texture;
           gl_FragColor *= uAlpha;
+          
+          } else {
+            gl_FragColor = vec4(0.05,0.05,0.05,1.0);
+          }
         }
         `
     
@@ -151,13 +159,15 @@ export default class ProjectDeformContent {
             uImageSize: { value: new THREE.Vector2(0, 0) },
             uScale: { value: 1. },
             uVelo: this.velocityUniform,
-            uAlpha: { value: 0.1 }
+            uAlpha: { value: 0.1 },
+            uTextureLoad: { value: 0.}
         }
     
         this.planes.push(mesh);
         const loader = new THREE.TextureLoader()
         let img = document.querySelector('.project-img')
         this.texture = loader.load(this.currentProject[i], (texture) => {
+
           texture.minFilter = THREE.LinearFilter
           texture.generateMipmaps = false
           /*var repeatX, repeatY;
@@ -168,6 +178,7 @@ export default class ProjectDeformContent {
           this.texture.repeat.set(repeatX, repeatY);
           this.texture.offset.x = (repeatX - 1) / 2 * -1;*/
           //scene.getObjectByName('plane'+ i) == planes[i])
+          this.planes[i].material.uniforms.uTextureLoad.value = 1.;
           this.planes[i].material.uniforms.uTexture.value = texture;
           this.planes[i].material.uniforms.uImageSize.value = [img.naturalWidth, img.naturalHeight];
           this.planes[i].position.y = -60 * i;

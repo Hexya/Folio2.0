@@ -10,15 +10,15 @@ import JapMap from '../assets/img/project/WLDLGHTScreen.jpg';
 import canvasSound from '../assets/img/project/CanvasSoundScreen.jpg';
 import { TweenMax, Power2, TimelineLite } from 'gsap/TweenMax';
 import { GLTFLoader } from 'three/examples/js/loaders/GLTFLoader';
-import { clamp, map } from '../scripts/utils/math'
+import { clamp, map } from '../scripts/utils/math';
 
 let OrbitControls = require('three-orbit-controls')(THREE)
 
 import 'three/examples/js/postprocessing/EffectComposer';
 import 'three/examples/js/postprocessing/RenderPass';
 import 'three/examples/js/postprocessing/ShaderPass';
-import 'three/examples/js/shaders/CopyShader'
-import 'three/examples/js/shaders/DotScreenShader'
+import 'three/examples/js/shaders/CopyShader';
+import 'three/examples/js/shaders/DotScreenShader';
 import 'three/examples/js/shaders/LuminosityHighPassShader';
 import 'three/examples/js/postprocessing/UnrealBloomPass';
 import 'three/examples/js/shaders/FXAAShader.js';
@@ -28,7 +28,13 @@ import { TimelineMax, Power4 } from 'gsap';
 // UTILS CLASS
 import { getPerspectiveSize } from './utils/3d';
 import TypingEffect from './TypingEffect';
-import ProjectDeformContent from './ProjectDeformContent'
+import ProjectDeformContent from './ProjectDeformContent';
+
+//SHADER
+import noiseDeformVertex from './Shader/NoiseDeform/vertexShader.glsl';
+import noiseDeformFragment from './Shader/NoiseDeform/fragmentShader.glsl';
+import chromaVertex from './Shader/Chroma/vertexShader.glsl';
+import chromaFragment from './Shader/Chroma/fragmentShader.glsl';
 
 //TEMPLATES TITLE
 let firstSceneTemplate = require('./Templates/Scenes/firstSceneTemplate.tpl');
@@ -466,44 +472,8 @@ export default class App {
                 side: THREE.DoubleSide,
                 uniforms: uniforms,
                 transparent:true,
-                vertexShader:
-                    ` varying vec2 vUv;
-  
-                  void main(){  
-                    vUv = uv; 
-                    //modelViewMatrix: es la posición y orientación de la cámara dentro de la escena
-                    //projectionMatrix: la proyección para la escena de la cámara incluyendo el campo de visión
-                    vec4 modelViewPosition = modelViewMatrix * vec4(position, 1.0);
-                    gl_Position = projectionMatrix * modelViewPosition;
-                  }`,
-                fragmentShader:
-                    ` uniform float time;
-                  uniform float uAlpha;
-                  uniform float uFrequency;
-                  uniform float uAmplitude;
-                  uniform vec2 resolution;
-                  uniform sampler2D texture1;
-                  
-                  varying vec2 vUv;
-                  
-                  void main() {  
-                    vec2 uv1 = vUv;
-                    // variable que contiene el eje de coordenadas
-                    vec2 uv = gl_FragCoord.xy/resolution.xy;
-                    
-                    float frequency = uFrequency;
-                    float amplitude = uAmplitude;
-                    
-                    float x = uv1.y * frequency + time * .7; 
-                    float y = uv1.x * frequency + time * .3;
-                    
-                    uv1.x += cos(x+y) * amplitude * cos(y);
-                    uv1.y += sin(x-y) * amplitude * cos(y);
-                
-                    vec4 rgba = texture2D(texture1, uv1);
-                    gl_FragColor = rgba;
-                    gl_FragColor *= uAlpha;
-                  }`
+                vertexShader: noiseDeformVertex,
+                fragmentShader: noiseDeformFragment
             });
         };
 
@@ -880,74 +850,8 @@ export default class App {
                 },
                 power: { value: 0.5 }
             },
-
-            vertexShader: `
-    
-        varying vec2 vUv;
-    
-        void main() {
-    
-          vUv = uv;
-          gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-    
-        }
-        `,
-
-            fragmentShader: `
-			uniform sampler2D tDiffuse;
-			uniform vec2 resolution;
-			uniform float uDistortion;
-
-			vec2 barrelDistortion(vec2 coord, float amt) {
-				vec2 cc = coord - 0.5;
-				float dist = dot(cc, cc);
-				return coord + cc * dist * amt;
-			}
-
-			float sat( float t )
-			{
-				return clamp( t, 0.0, 1.0 );
-			}
-
-			float linterp( float t ) {
-				return sat( 1.0 - abs( 2.0*t - 1.0 ) );
-			}
-
-			float remap( float t, float a, float b ) {
-				return sat( (t - a) / (b - a) );
-			}
-
-			vec4 spectrum_offset( float t ) {
-				vec4 ret;
-				float lo = step(t,0.5);
-				float hi = 1.0-lo;
-				float w = linterp( remap( t, 1.0/6.0, 5.0/7.0 ) );
-				ret = vec4(lo,1.0,hi, 1.) * vec4(1.0-w, w, 1.0-w, 1.);
-
-				return pow( ret, vec4(1.0/2.2) );
-			}
-
-			const float max_distort = .5;
-			const int num_iter = 12;
-			const float reci_num_iter_f = 1.0 / float(num_iter);
-
-			void main()
-			{	
-				vec2 uv=(gl_FragCoord.xy/resolution.xy);
-
-				vec4 sumcol = vec4(0.0);
-				vec4 sumw = vec4(0.0);	
-				for ( int i=0; i<num_iter;++i )
-				{
-					float t = float(i) * reci_num_iter_f;
-					vec4 w = spectrum_offset( t );
-					sumw += w;
-					sumcol += w * texture2D( tDiffuse, barrelDistortion(uv, .6 * uDistortion*t ) );
-				}
-
-				gl_FragColor = sumcol / sumw;
-			}
-      `
+            vertexShader: chromaVertex,
+            fragmentShader: chromaFragment
         };
         //DEFAULT
         //const float max_distort = 2.2;
@@ -977,6 +881,7 @@ export default class App {
 
     updateWall() {
         if (!this.modelObj) return;
+        //Clamp lock a value beetween min and max
         let y = clamp(this.wallTargetPosition, this.wallAnchors[0], this.wallAnchors[this.wallAnchors.length - 1] + 10);
         if (isNaN(y)) return;
         this.wallTargetPosition = y;
@@ -1015,7 +920,7 @@ export default class App {
         }
 
 
-        // scroll to 1 if 10% + & go back if x < 80%
+        //scroll to 1 if 10% + & go back if x < 80%
         let remap = map(current, 0, this.wallAnchors[1], 0, 1);
         if (index === 0) {
             if (remap > .1 && remap < 1.) {
@@ -1078,15 +983,11 @@ export default class App {
             TweenMax.to(bloomPass, .3, {strength:0.4,threshold: 0.75, ease:Sine.easeOut}).delay(1);
         } 
         
-        // COUPE LE DANS ABOUT this.inAbout
+        //Stop update
         if (!this.inProject && !this.inAbout) {
             this.raycast();
             this.updateWall();
         }
-
-        //RAYCASTER
-
-
 
         // update lights
         let time = Date.now()/1000;// rayon
