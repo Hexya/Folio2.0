@@ -181,7 +181,7 @@ export default class ProjectDeformContent {
           this.planes[i].material.uniforms.uTexture.value = texture;
           //console.log(img.naturalWidth,img.naturalHeight)
           this.planes[i].material.uniforms.uImageSize.value = [1174, 881]; //naturalWidth, naturalHeight
-          this.planes[i].position.y = -60 * i;
+          this.planes[i].position.y = (-60 * i) - 10;
           let rand = Math.random() * (1.3 - 0.7) + 0.7;
           this.planes[i].scale.set(rand,rand,rand)
           i%2 ? this.planes[i].position.x += 3 : this.planes[i].position.x -= 3;

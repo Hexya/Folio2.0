@@ -56,7 +56,7 @@ let templates = [firstProjectContent, secProjectContent, thirdProjectContent, fo
 let composer, renderPass, bloomPass, chromaticAberration, chromaticAberrationPass;
 let params = {
     exposure: 0,
-    bloomStrength: 1,
+    bloomStrength: 0.9,
     bloomThreshold: 0,
     bloomRadius: .4
 };
@@ -355,11 +355,18 @@ export default class App {
     //PROFIL
     aboutPage() {
         let about = document.querySelector('.about-container');
+
         let tl = new TimelineLite();//Transition page
-        tl.to(this.scene.position, 2, {z:80, ease:Circ.easeInOut},5/10)
+        tl.to(this.scene.position, 2, {z:90, ease:Circ.easeInOut},5/10)
           .to(about, .5, {opacity:1, visibility:'visible', ease:Circ.easeInOut}, 1, '+=.5')
           .addPause()
           .pause();
+
+        let tlInproject = new TimelineLite();//Transition page
+        tlInproject.to(this.scene.position, 2, {z:0, ease:Circ.easeInOut},5/10)
+                   .to(about, .5, {opacity:1, visibility:'visible', ease:Circ.easeInOut}, 1, '+=.5')
+                   .addPause()
+                   .pause();
 
         let back = about.querySelector('.back-arrow');
         let returntxt = about.querySelector('.return');
@@ -379,12 +386,14 @@ export default class App {
             new TypingEffect('.about-container .formation','0.05','+=1');
             new TypingEffect('.about-container .desc','0.015','+=0');
             new TypingEffect('.about-container .designer','0.05','+=1.5');
-            tl.play();
+            this.scene.position.z < 10 ? tl.play() : tlInproject.play();
+            // tl.play();
             tltxt.play();
             this.inAbout = true;
         })
         document.querySelector('.back-arrow').addEventListener('click',()=> {
-            tl.reverse();
+            this.scene.position.z > 85 ? tl.reverse() : tlInproject.reverse();
+            // tl.reverse();
             tltxt.reverse();
             this.inAbout = false;
         })
@@ -468,8 +477,8 @@ export default class App {
         this.mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
         //console.log(this.scene.children)
         //NOMRAL LIGHT ON MOOVE
-        TweenMax.to(bloomPass, .3, {strength:1, ease:Sine.easeOut});
-        chromaticAberration.uniforms.uDistortion.value = .5;
+        TweenMax.to(bloomPass, .3, {strength:0.9, ease:Sine.easeOut});
+        chromaticAberration.uniforms.uDistortion.value = .3;
         for ( var i = 0; i < this.planeGroup.children.length; i++ ) {
             //NO DEFORMATION PROJECT
             TweenMax.to(this.planeGroup.children[i].material.uniforms.uFrequency, .7, {value: 0., ease:Sine.easeInOut})
@@ -643,7 +652,7 @@ export default class App {
             //Remove Project Deform
             this.inProjectUpdate = false;
             this.projectDeformContent.remove()
-            TweenMax.to(bloomPass, 1, {strength:1,threshold: 0, ease:Sine.easeOut}).delay(1);
+            TweenMax.to(bloomPass, 1, {strength:0.9,threshold: 0, ease:Sine.easeOut}).delay(1);
             this.rotateCam = true;
 
             //REMOVE CONTENT
@@ -713,10 +722,12 @@ export default class App {
         for ( let i = 0; i < this.intersects.length; i++ ) {
 
             //POWER LIGHT ON HOVER
-            TweenMax.to(bloomPass, .3, {strength:1.5, ease:Sine.easeOut});
-            chromaticAberration.uniforms.uDistortion.value = 2.;
+            //If project diff from sabine (White plane so much light)
+            this.intersects[0].object.name != "Plane3" ? TweenMax.to(bloomPass, .3, {strength:1.5, ease:Sine.easeOut}) : TweenMax.to(bloomPass, .3, {strength:1.2, ease:Sine.easeOut});
+            // TweenMax.to(bloomPass, .3, {strength:1.4, ease:Sine.easeOut});
+            chromaticAberration.uniforms.uDistortion.value = 1.5;
             document.body.style.cursor = "pointer";
-            //console.log(this.intersects[0].object)
+            // console.log(this.intersects[0].object)
 
             //ACTUALISE WAVE ON HOVER
             this.waterDeform += 0.1;
@@ -753,7 +764,7 @@ export default class App {
                     //Remove Project Deform
                     this.inProjectUpdate = false;
                     this.projectDeformContent.remove()
-                    TweenMax.to(bloomPass, 1, {strength:1,threshold: 0, ease:Sine.easeOut}).delay(1);
+                    TweenMax.to(bloomPass, 1, {strength:0.9,threshold: 0, ease:Sine.easeOut}).delay(1);
                     this.rotateCam = true;
 
                     //REMOVE CONTENT
@@ -890,7 +901,7 @@ export default class App {
 
         chromaticAberration = {
             uniforms: {
-                uDistortion: { type: "f", value: .5 },
+                uDistortion: { type: "f", value: .3 },
                 tDiffuse: { type: "t", value: null },
                 resolution: {
                     value: new THREE.Vector2(
@@ -898,7 +909,7 @@ export default class App {
                         window.innerHeight
                     )
                 },
-                power: { value: 0.5 }
+                power: { value: 0.4 }
             },
             vertexShader: chromaVertex,
             fragmentShader: chromaFragment
