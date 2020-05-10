@@ -83,6 +83,7 @@ export default class App {
         this.isMacLike = /(Mac|iPhone|iPod|iPad)/i.test(navigator.platform);
         this.device;
         this.scrollOffset = 0;
+        this.isScrolling = false;
 
         //scroll
         this.delta = 0;
@@ -114,6 +115,7 @@ export default class App {
         this.mouse = new THREE.Vector2();
         this.stopProp = false;
         this.ignore = document.querySelector('.about-container')
+        this.ignoreTo = document.querySelector('.stop-prop')
 
         //THREE SCENE
         this.container = document.querySelector( '#main' );
@@ -322,7 +324,11 @@ export default class App {
         window.addEventListener('wheel', this.mouseWheel.bind(this));
         window.addEventListener('wheel', this.getDevice.bind(this));
         window.addEventListener('touchmove',this.touchMove.bind(this));
-        document.body.addEventListener('click', this.goToproject.bind(this));
+        if(this.isMacLike) {
+            document.body.addEventListener('click', this.goToproject.bind(this));
+        } else {
+            document.body.addEventListener('touchend', this.goToproject.bind(this));
+        }
     }
 
     getDevice(e) {
@@ -379,8 +385,21 @@ export default class App {
              .from(returntxt, 2, {opacity:0, marginTop:'-.1vh', ease:Circ.easeInOut}, '-=1.75')
              .addPause()
              .pause();
+        if(this.isMacLike) {
+            document.querySelector('.contact p').addEventListener('touchend',(e)=> {
 
-        document.querySelector('.contact p').addEventListener('click',(e)=> {
+                e.stopPropagation();
+                new TypingEffect('.about-container .formation','0.05','+=1');
+                new TypingEffect('.about-container .desc','0.015','+=0');
+                new TypingEffect('.about-container .designer','0.05','+=1.5');
+                this.scene.position.z < 10 ? tl.play() : tlInproject.play();
+                // tl.play();
+                tltxt.play();
+                this.inAbout = true;
+            })
+        }
+        else {
+            document.querySelector('.contact p').addEventListener('click',(e)=> {
 
             e.stopPropagation();
             new TypingEffect('.about-container .formation','0.05','+=1');
@@ -391,6 +410,7 @@ export default class App {
             tltxt.play();
             this.inAbout = true;
         })
+    }
         document.querySelector('.back-arrow').addEventListener('click',()=> {
             this.scene.position.z > 85 ? tl.reverse() : tlInproject.reverse();
             // tl.reverse();
@@ -400,13 +420,18 @@ export default class App {
     }
 
     touchMove(e) {
+        this.isScrolling = true;
         //IF NOT IN PROJECT OR ABOUT MOBILE
         if(document.querySelector('.project-content')== null) {
             if(this.beginMove.length < 1) {
               this.beginMove.push(e.changedTouches["0"].clientY)
             }
             let movement = this.beginMove[0]-e.changedTouches["0"].clientY;
-            this.wallTargetPosition += movement * 0.1; //real 0.1 for test 0.02
+            if(this.isMacLike) {
+                this.wallTargetPosition += movement * 0.03; //Ios
+            } else {
+                this.wallTargetPosition += movement * 0.1; //real 0.1 for test 0.02
+            }
             setTimeout(()=> {
                 this.beginMove = [];
               },500)
@@ -428,6 +453,9 @@ export default class App {
                 this.backRockScroll = true;
             }   
         }
+        window.addEventListener('touchend',()=> {
+            this.isScrolling = false;
+        })
     }
 
     mouseWheel(event) {
@@ -617,93 +645,101 @@ export default class App {
              .staggerFrom(document.querySelectorAll('.img-row'),1, {autoAlpha:0},'0.5','-=0.5')
 
         // AJOUTE LE CLICK
-        document.querySelector('.project-arrow').addEventListener('click', () => {
-            
-            window.history.pushState('Home', 'Home', '/');
-            let project = document.querySelector('.project-container');
-            let tlOpacity = new TimelineLite();//Transition page
-            //Remove txt
-            tlOpacity.to(document.querySelectorAll('.row'),0.25, {autoAlpha:0},'0.5','+=1')
-                        .to(document.querySelectorAll('.img-row'),0.5, {autoAlpha:0},'0.5','-=0.5')
-                        .to(project, .25, {opacity:0, visibility:'hidden', ease:Circ.easeInOut}, 1, '+=.5')
-                        .addPause().pause();
-            tlOpacity.play();
-            //BACKROCK OPACITY
-            TweenMax.to(this.backRock.children[0].material, .7, {opacity: 0, ease:Sine.easeInOut})
-            //Replace camera
-            let title = document.querySelector('.txt-container')
-            let tl = new TimelineLite();
-            if(window.matchMedia('(max-width:800px)').matches) {
-                tl.to(this.scene.position, 2, {z:0, ease:Circ.easeInOut}) //UNZOOM
-                    .to(title, .2, {visibility:'visible', ease:Circ.easeInOut},'-=1') //REAPPEAR TITLE
-                    .to(title, 1, {opacity:1, ease:Circ.easeInOut}, '-=1.2' ) //REAPPEAR TITLE
-                    .to(this.contact, .2, {visibility:'visible', ease:Circ.easeInOut},'-=1.3') //REAPPEAR CONTACT
-                    .to(this.contact, 1, {opacity:0.7, ease:Circ.easeInOut}, '-=1.5') // REAPPEAR CONTACT 
+        if(this.isMacLike) {
+            document.querySelector('.project-arrow').addEventListener('touchend', () => {
+                this.backToHome()
+            })
+        } else {
+            document.querySelector('.project-arrow').addEventListener('click', () => {
+                this.backToHome()
+            })
+        }
+    }
+
+    backToHome() {
+        //window.history.pushState('Home', 'Home', '/');
+        let project = document.querySelector('.project-container');
+        let tlOpacity = new TimelineLite();//Transition page
+        //Remove txt
+        tlOpacity.to(document.querySelectorAll('.row'),0.25, {autoAlpha:0},'0.5','+=1')
+                    .to(document.querySelectorAll('.img-row'),0.5, {autoAlpha:0},'0.5','-=0.5')
+                    .to(project, .25, {opacity:0, visibility:'hidden', ease:Circ.easeInOut}, 1, '+=.5')
                     .addPause().pause();
-            } else {
-                tl.to(this.scene.position, 2, {z:0, ease:Circ.easeInOut}) //UNZOOM
+        tlOpacity.play();
+        //BACKROCK OPACITY
+        TweenMax.to(this.backRock.children[0].material, .7, {opacity: 0, ease:Sine.easeInOut})
+        //Replace camera
+        let title = document.querySelector('.txt-container')
+        let tl = new TimelineLite();
+        if(window.matchMedia('(max-width:800px)').matches) {
+            tl.to(this.scene.position, 2, {z:0, ease:Circ.easeInOut}) //UNZOOM
                 .to(title, .2, {visibility:'visible', ease:Circ.easeInOut},'-=1') //REAPPEAR TITLE
                 .to(title, 1, {opacity:1, ease:Circ.easeInOut}, '-=1.2' ) //REAPPEAR TITLE
                 .addPause().pause();
-            }
-            tl.play();
-            //console.log('Unzoom project')
-            
-            //Remove Project Deform
-            this.inProjectUpdate = false;
-            this.projectDeformContent.remove()
-            TweenMax.to(bloomPass, 1, {strength:0.9,threshold: 0, ease:Sine.easeOut}).delay(1);
-            this.rotateCam = true;
+        } else {
+            tl.to(this.scene.position, 2, {z:0, ease:Circ.easeInOut}) //UNZOOM
+            .to(title, .2, {visibility:'visible', ease:Circ.easeInOut},'-=1') //REAPPEAR TITLE
+            .to(title, 1, {opacity:1, ease:Circ.easeInOut}, '-=1.2' ) //REAPPEAR TITLE
+            .addPause().pause();
+        }
+        tl.play();
+        //console.log('Unzoom project')
+        
+        //Remove Project Deform
+        this.inProjectUpdate = false;
+        this.projectDeformContent.remove()
+        TweenMax.to(bloomPass, 1, {strength:0.9,threshold: 0, ease:Sine.easeOut}).delay(1);
+        this.rotateCam = true;
 
-            //REMOVE CONTENT
-            setTimeout(()=> {
-                this.inProject = false;
-                document.querySelector('.project-container').innerHTML = ''
-            },1500)
-        })
-              
+        //REMOVE CONTENT
+        setTimeout(()=> {
+            this.inProject = false;
+            document.querySelector('.project-container').innerHTML = ''
+        },1500)
     }
 
     goToproject(ev) {
         let target = ev.target;
         //Lock no intersect / in project / about mobile click
-        if (!this.intersecting || this.inProject ||target === this.ignore || this.ignore.contains(target)) return;
-        
-        const firstIntersect = this.intersects[0];
+        if (!this.intersecting || this.inProject || target === this.ignore || this.ignore.contains(target) || target === this.ignoreTo || this.ignoreTo.contains(target)) return;
 
-        if (this.inProject == false && firstIntersect.object.index != 4) { //Locked click for in progress
-            //console.log(firstIntersect.object)
-            let title = this.textContainer
-            let tl = new TimelineLite();
-            if(window.matchMedia('(max-width:800px)').matches) {
-                tl.to(this.scene.position, 2, {z:80, ease:Circ.easeInOut}) //ZOOM
-                    .to(title, 2, {opacity:0, ease:Circ.easeInOut}, '-=2') // DISAPPEAR TITLE
-                    .to(title, 1, {visibility:'hidden', ease:Circ.easeInOut}) // DISAPPEAR TITLE
-                    .to(this.contact, 1, {opacity:0, ease:Circ.easeInOut}, '-=2') // DISAPPEAR CONTACT 
-                    .to(this.contact, 1, {visibility:'hidden', ease:Circ.easeInOut}) // DISAPPEAR CONTACT
-                    .addPause().pause()
-            } else {
-                tl.to(this.scene.position, 2, {z:80, ease:Circ.easeInOut}) //ZOOM
-                    .to(title, 2, {opacity:0, ease:Circ.easeInOut}, '-=2') // DISAPPEAR TITLE
-                    .to(title, 1, {visibility:'hidden', ease:Circ.easeInOut}) // DISAPPEAR TITLE
-                    .addPause().pause()
-            }
-            tl.play()
-            this.inProjectUpdate = true;
-            this.rotateCam = false;
-
-            //BACKROCK OPACITY
-            TweenMax.to(this.backRock.children[0].material, .8, {opacity: 1, ease:Sine.easeInOut})
+        if(this.isScrolling == false && this.inAbout == false) {
             
-            let index = firstIntersect.object.index;
+            const firstIntersect = this.intersects[0];
 
-            if (typeof index !== 'undefined') {
-                this.projectPage(templates[index]);
-                this.projectDeformContent = new ProjectDeformContent(this.scene, index);
-                this.inProject = true;
+            if (this.inProject == false && firstIntersect.object.index != 4) { //Locked click for in progress
+                //console.log(firstIntersect.object)
+                let title = this.textContainer
+                let tl = new TimelineLite();
+                if(window.matchMedia('(max-width:800px)').matches) {
+                    tl.to(this.scene.position, 2, {z:80, ease:Circ.easeInOut}) //ZOOM
+                        .to(title, 2, {opacity:0, ease:Circ.easeInOut}, '-=2') // DISAPPEAR TITLE
+                        .to(title, 1, {visibility:'hidden', ease:Circ.easeInOut}) // DISAPPEAR TITLE
+                        .addPause().pause()
+                } else {
+                    tl.to(this.scene.position, 2, {z:80, ease:Circ.easeInOut}) //ZOOM
+                        .to(title, 2, {opacity:0, ease:Circ.easeInOut}, '-=2') // DISAPPEAR TITLE
+                        .to(title, 1, {visibility:'hidden', ease:Circ.easeInOut}) // DISAPPEAR TITLE
+                        .addPause().pause()
+                }
+                tl.play()
+                this.inProjectUpdate = true;
+                this.rotateCam = false;
+
+                //BACKROCK OPACITY
+                TweenMax.to(this.backRock.children[0].material, .8, {opacity: 1, ease:Sine.easeInOut})
+                
+                let index = firstIntersect.object.index;
+
+                if (typeof index !== 'undefined') {
+                    this.projectPage(templates[index]);
+                    this.projectDeformContent = new ProjectDeformContent(this.scene, index);
+                    this.inProject = true;
+                }
+                
             }
-            
         }
+        this.isScrolling = false;
     }
 
     raycast() {
@@ -854,7 +890,6 @@ export default class App {
             this.textContainer.classList.add('mobile-intro-container');
             this.textContainer.innerHTML = firstSceneTemplate;
             new TypingEffect('.hidari .txt-f','0.05','+=2','.hidari .txt-s','.migi .txt-f','-=0', '.migi .txt-s','-=0');
-
             return 0
         }
         else {
@@ -1007,6 +1042,15 @@ export default class App {
             this.textContainer.innerHTML = firstSceneTemplate;
             new TypingEffect('.hidari .txt-f','0.05', 0,'.hidari .txt-s','.migi .txt-f','-=0', '.migi .txt-s', 0);
             if(this.fontMesh) TweenMax.to(this.fontMesh.material,.5, { opacity: 1, ease:Circ.easeInOut})// fontMesh appear
+
+            //Appear contact on index 0 mobile
+            if(window.matchMedia('(max-width:800px)').matches) {
+                let tl = new TimelineLite();
+                  tl.to(this.contact, .2, {visibility:'visible', ease:Circ.easeInOut}) //REAPPEAR CONTACT
+                    .to(this.contact, 1, {opacity:0.7, ease:Circ.easeInOut}, '-=0.2') // REAPPEAR CONTACT 
+                    .addPause().pause();
+                  tl.play();
+            }   
         } else {
             if(document.querySelector('.mobile-intro-container')) {
                 this.textContainer.classList.remove('mobile-intro-container');
@@ -1014,6 +1058,16 @@ export default class App {
                 //TweenMax.to(this.fontMesh.material,.5, { opacity: 0, ease:Circ.easeInOut})// Remove fontMesh
             }
             this.animateInfoProject(index);
+
+            //Remove contact on scroll mobile
+            if(window.matchMedia('(max-width:800px)').matches) {
+                let tl = new TimelineLite();
+                tl.to(this.contact, 1, {opacity:0, ease:Circ.easeInOut}) // DISAPPEAR CONTACT 
+                  .to(this.contact, 1, {visibility:'hidden', ease:Circ.easeInOut}) // DISAPPEAR CONTACT
+                  .addPause().pause();
+                tl.play();
+            }  
+            
         }
     }
 
