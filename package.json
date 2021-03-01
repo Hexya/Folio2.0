@@ -38,7 +38,7 @@
     "loader": "^2.1.1",
     "stats-js": "^1.0.0-alpha1",
     "style-loader": "^0.23.1",
-    "three": "^0.99.0",
+    "three": "^0.125.0",
     "three-collada-loader": "0.0.1",
     "three-effectcomposer": "0.0.1",
     "three-fbx-loader": "^1.0.3",
